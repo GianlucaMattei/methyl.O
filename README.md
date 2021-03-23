@@ -1,21 +1,6 @@
 # methyl.O
 Deferentially methylated regions analysis 
 
----
-title: "Vignette Title"
-author: 
-- name: Gianluca Mattei
-  email: gianluca.mattei@unifi.it
-- Federico Di Salvi
-- Alberto Magi
-package: Methyl.O
-output: 
-    BiocStyle::html_document
-vignette: >
-    %\VignetteIndexEntry{Vignette Title}
-    %\VignetteEngine{knitr::rmarkdown}
-    %\VignetteEncoding{UTF-8}  
----
 # Introduction
 During the last years the adaptation of next generation sequencing technologies to epigenetic studies has revolutionized the ability to study the methylation status of DNA. Despite the development of new techniques and the increasing interest in epigenomic, the landscape of available tools does not offer a wide range of possibilities for annotation. Here we present Methyl.O, a R package and an online tool focused on interpretations of methylation analysis. While the practical user interface benefits non- bioinformatic users, the R package allows those more experienced to perform methylation analyses with more in-depth control over parameters. The user interface can also be run in local by R, to facilitate preliminary analyses and to easily visualize data distribution and methylated gene regions. A peculiarity of Methyl.O results is the ranked list of the genes most affected by methylation and, according to available databases, most involved in pathologies. The ranked list suggests the genes to focus on to understand methylation effects and to consider for further analyses. Furthermore Methyl.O allows, when expression profiles are provided, to compare transcriptomics to methylome to have a deeper insight into the resulting phenotype. Methyl.O also offers the possibility to perform enrichment analysis, based on the package EnrichR, for a better interpretation of results. Finally, among the peculiarities that we implemented in our tool, the possibility to annotate enhancers and TFs to genes in order to predict the effects on expression. Moreover, both enhancers and TFs results can be integrated with expression profiles for a better understanding of the impact that methylation of these elements may lead to.
 
