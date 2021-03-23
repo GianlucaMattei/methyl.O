@@ -53,7 +53,7 @@ Otherwise in the GUI’s Homepage is possible to upload custom files specifying 
 #### Gene Model and Gene’s Features:
 Each is based on the classical gene model, which includes the promoter, the 5’/3’ UTRs and the exons/introns, and additional features specific to the methylation: the head of the gene and the TSS surrounding region. While the head corresponds to the first part of the gene, the TSS surrounding region results from considering the promoter and the head as a single range where methylation may have a greater effect on gene expression. As shown in the figure 1 \@ref(fig:figure1), by considering TSS surrounding or head regions for the annotation it is possible to avoid overlapping features. In fact, in some cases, the 5’ and the 3’ UTRs may overlap part of the first and last exon respectively (A), they can coincide with the first and the last exon or they can be absent (B) and in other cases they can overlap more than one exons (C). Thus considering only the 5’UTRs will exclude some genes while considering both 5’UTR and the first exons will lead to redundant results.
 
-![**Figure 1**: Schematic gene model](./methyl.O/vignettes/genemodels.png)
+![**Figure 1**: Schematic gene model](https:/guthub.com/GianlucaMattei/methyl.O/vignettes/genemodels.png)
 : (\##fig:figure1)
 
 ## Annotate DMRs:
