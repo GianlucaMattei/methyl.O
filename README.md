@@ -34,6 +34,9 @@ methyl.O is also available online at: “INSERIRE DOMINIO”
 #### **R:**	 
 To run methyl.O you need a data.frame object with the genomic coordinates (chr, start and end) on the first three columns and the beta difference values on the fourth column. Specific beta values for the samples, used to score the beta difference values, are optional but recommended. The Beta difference values must be a fraction of 1. Additional columns will be stored in output under the "others" field
 
+<p align="center">
+
+
 seqnames|	start    	|	end  		|   betadiff	|   betaTum 	|   betaHlt	|   pval
 --------|---------------|---------------|---------------|---------------|-----------|--------
 chr10	|	38300277	|   38300763	|   -0.355	    |   0.474		|   0.031	|   0.030
@@ -43,6 +46,7 @@ chr10	|	105343883	|   105344827	|   0.315	    |   0.058		|   0.35	|   0.003
 chr10	|	105728786	|   105730463	|   -0.386	    |   0.75		|   0.181	|   0.032
 chr10	|	115999356	|   115999894	|   0.384	    |   0		    |   0.636	|   0.020
 
+</p>
 
 
 
@@ -98,6 +102,8 @@ Column's Position of Beta Values of Sample 2 | Select the column number where to
 
 In the GUI we also implemented some plots to have a quick overview on results. These plots are in order: the beta difference values distribution by chromosome, the number distribution of DMRs by chromosome, the distribution of widths, ranks, beta values and database scores, for each annotation (Genes, Heads, TSS surrounding, Promoters, Exons, 5’UTRs, 3’UTRs, Introns). Two additional annotations can be plotted (First exons, First introns). The last plot compares the number of DMRs for each annotated region. Each of these plots has some specific customization settings by clicking on the red gear button. Other common settings are placed in the left column of the page:
 
+<p align="center">
+
 Command | Description
 -|-
 Met Width Min | Minimum methylation width threshold in bp 
@@ -107,9 +113,9 @@ Selected Feature Percentage Max | Maximum methylation width threshold in %
 Feature Rank Min | Minimum rank threshold 
 Feature Rank Max | Maximum rank threshold
 
-: (\##tab:table3)
-
 **Table 3:** Additional parameters for plots and for results table in Annotate Methylated Regions tab
+
+</p>
 
 The last two options, Feature Rank Min and Max refer to the ranking position of the features in the gene model. For example, considering the exons, the first is rank 1, the second rank 2 and so on. The same for the introns. Of course these parameters are not useful for other features as promoters, heads and other non rankable features, thus they will not affect the plots related to these features. 
 
