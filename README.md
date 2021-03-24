@@ -11,7 +11,7 @@ It can be installed as follow:
 
 Bioconductor:
 
-```Bioconductor
+```R
 if (!requireNamespace("BiocManager", quietly=TRUE)) 
 install.packages("BiocManager") 
 BiocManager::install(methyl.O)
@@ -19,7 +19,7 @@ BiocManager::install(methyl.O)
 
 GitHub:
 
-```GitHub
+```R
 devtools::install_github(GianlucaMattei/methyl.O)
 ```
 
