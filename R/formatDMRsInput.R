@@ -1,14 +1,14 @@
 #' Convert input table to proper format. 
 #' 
-#' Convert input table to proper format to use getMetAnnotations(). The firts three column of the input table must have chr, start, end coordinates. 
+#' Convert input table to proper format. The firts three column of the input table must have chr, start, end coordinates. 
 #'  
-#' @param tableIn convert input table in suitable format for getMetAnnotations()
-#' @param thr.beta beta difference threshold
-#' @param col.betadiff value indicating the column position of beta difference within the table
-#' @param col.beta1 value indicating the column position of beta value of first sample within the table if present
-#' @param col.beta2 value indicating the column position of beta value of second sample within the table if present
+#' @param DMRsRanges the DMRs ranges, it must have the following columns: chr, start, end, beta diff. Other columns will be stored in the resulting output under the column other.
+#' @param thr.beta numeric, beta difference threshold to consider methylations. Default = 0.3
+#' @param col.betadiff numeric, column position for beta diff. in input table. Default = 4
+#' @param col.beta1 numeric, column position for first sample beta values in input table
+#' @param col.beta2 numeric, column position for second sample beta values in input table
 #' 
-#' @return a data.frame 
+#' @return data.frame of DMR ranges
 #' 
 #' @export
 

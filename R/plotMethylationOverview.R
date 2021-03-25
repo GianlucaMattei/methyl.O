@@ -2,24 +2,24 @@
 #'
 #' Plot distribution of beta values on chromosomes, this function has mainly an internal utility and is design for shinyApp version of package
 #'
-#' @param res the input table resulting from getMetAnnotations or scoreMets.
-#' @param opt type of plot. Can be 'violin' or 'boxplot'
-#' @param col color palette of plot. It must be one resulting from hcl.pals()
+#' @param annotatedDMRs anotated DMRs list resultingfrom annotateDMRs() or scoreAnnotatedDMRs()
+#' @param plot.type  character, compute or not different linear models for upregulated and downregulated genes. Accepted: "simple" or "splitted". Default = "splitted".
+#' @param palette character, color palette of plot. It must be one resulting from hcl.pals()
 #'
-#' @return plot
+#' @return plot of enrichR results
 #'
 #' @export
 
-plotMethylationOverview <- function(res, opt, col) {
+plotMethylationOverview <- function(annotatedDMRs, plot.type, palette) {
     plot.df <- data.frame(
-        chr = res[[1]]$seqnames, Beta = res[[1]]$beta, direction = ifelse(res[[1]]$beta < 0, "down", "up"),
+        chr = annotatedDMRs[[1]]$seqnames, Beta = annotatedDMRs[[1]]$beta, direction = ifelse(annotatedDMRs[[1]]$beta < 0, "down", "up"),
         stringsAsFactors = T
     )
 
-    if (col == "BlackWhite") {
+    if (palette == "BlackWhite") {
         palette <- rep(22, "black")
     } else {
-        palette <- hcl.colors(length(unique(plot.df$chr)), palette = col)
+        palette <- hcl.colors(length(unique(plot.df$chr)), palette = palette)
     }
 
     if (opt == "boxplot") {

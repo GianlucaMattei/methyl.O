@@ -17,8 +17,7 @@ runOnDesktop <- function(){
                 icon = shiny::icon("home"), 
                 shiny::mainPanel(
                     align = "center", width = 8,
-                    shiny::h1("Welcome in methyl.O", style = "color:red"),
-                    shiny::hr(),
+                    shiny::imageOutput("logo", height = 66),
                     shiny::h5("Start to navigate to use a toy dataset or upload your data", style = "color:grey"),
                     shiny::hr(style = "border-top: 0px solid white;"),
                     shiny::fluidPage(
@@ -50,7 +49,6 @@ runOnDesktop <- function(){
                     shiny::sliderInput("promLength", label = "Select Promoter Lengths", min = 0, max = 5000, value = 1500),
                     shiny::sliderInput("headLength", label = "Select Head Lengths", min = 0, max = 5000, value = 1500),
                     shiny::sliderInput(inputId = "thrCGIs", label = "Length Percentage of Altered Methylated CGIs", min = 0, max = 1, step = 0.01, value = 0.3),
-                    shiny::sliderInput(inputId = "thrEnhancer", label = "Length Percentage of Altered Methylated Enhancers", min = 0, max = 1, step = 0.01, value = 0.4),
                     shiny::sliderInput(inputId = "thrBeta", label = "Beta Diff. Threshold", min = 0, max = 1, step = 0.01, value = 0.3),
                     shiny::numericInput(inputId = "colBetaDiff", "Column Position of Beta Diff.", value = 4),
                     shiny::numericInput(inputId = "betacol1", "Column's Position of Beta Values of Sample 1", value = NULL),
@@ -242,7 +240,7 @@ runOnDesktop <- function(){
                     # PARAMETERS 
                     shiny::selectInput(inputId = "paramType", label = "Type of Parameter to filter Overlapping Methylation", choices = c("DMR Length" = "dmr.length", "Overlap Length" = "overlap.length", "Overlap Perc." = "overlap.percentage"), selected = "overlap.length"),
                     shiny::numericInput("overlapParamThr", "Overlapping Methylation Value Threshold for Filtering", value = 100),
-                    shiny::numericInput("expressionStatThr", "Statistic Threshold", value = 0.05),
+                    shiny::numericInput("expressionStatThr", "Statistic Threshold", value = 0.05, step = 0.01),
                     shiny::numericInput("expressionLFCthr", "LogFC Threshold", value = 0.5, step = 0.05),
                     shiny::numericInput("metExprBetaThr", "Beta Diff Threshold", value = .3, step = 0.05),
                     shiny::selectInput(inputId = "metExpressionCorDB", label = "Filter by DB", choices = c("dgv", "gnomad", "NCG", "COSMIC", "cosmic.CGIs", "CGIs"), multiple = TRUE),
@@ -303,7 +301,7 @@ runOnDesktop <- function(){
                     # PARAMETERS
                     shiny::selectInput(inputId = "paramTypeEnh", label = "Type of Parameter to filter Overlapping Methylation", choices = c("DMR Length" = "dmr.length", "Overlap Length" = "overlap.length", "Overlap Perc." = "overlap.percentage"), selected = "overlap.percentage"),
                     shiny::numericInput("overlapParamThrEnh", "Overlapping Methylation Value Threshold for Filtering", value = 40),
-                    shiny::numericInput("expressionStatThr", "Statistic Threshold", value = 0.05),
+                    shiny::numericInput("expressionStatThr", "Statistic Threshold", value = 0.05, step = 0.01),
                     shiny::numericInput("expressionLFCthr", "LogFC Threshold", value = 0.5, step = 0.05),
                     shiny::sliderInput(inputId = "enhExprBetaThr", label = "Enhancer Methylation Beta Threshold", min = 0, max = 1, step = 0.05, value = 0.3),
                     shinyWidgets::prettyRadioButtons("enhancerDB", "Select Enhancer DB", c("4DGenome" = "4DGenome", "FANTOM5" = "FANTOM5"), selected = "FANTOM5", shape = "curve"),
@@ -397,7 +395,7 @@ runOnDesktop <- function(){
                     shiny::h5("TFs Targets/Expression Correlation Parameters", style = "color:black"),                    
                     shiny::numericInput("expressionLFCthrTF", "LogFC Threshold", value = 0.584, step = 0.05),
                     shiny::numericInput("metExprBetaThrTF", "Beta Diff Threshold", value = .3, step = 0.05),
-                    shiny::numericInput("expressionStatThrTF", "Statistic Threshold", value = 0.05),
+                    shiny::numericInput("expressionStatThrTF", "Statistic Threshold", value = 0.05, step = 0.01),
                     shiny::selectInput(inputId = "paramTypeTF", label = "Type of Parameter to filter Overlapping Methylation", choices = c("DMR Length" = "dmr.length", "Overlap Length" = "overlap.length", "Overlap Perc." = "overlap.percentage"), selected = "overlap.percentage"),
                     shiny::numericInput("overlapParamThrTF", "Overlapping Methylation Value Threshold for Filtering", value = 30),
                     shiny::hr(),
@@ -474,7 +472,18 @@ runOnDesktop <- function(){
     #####################################################################
 
     server <- function(input = input, output = output, server = server) {
-        libpath <- paste0(.libPaths()[1], "/methylO")
+        libpath <- paste0(.libPaths()[1], "/methyl.O")
+
+
+        output$logo <- shiny::renderImage({
+            logo <- paste0(.libPaths()[1], "/methyl.O/data/logo5.png")
+            list(src = logo,
+                width =" 20%",
+                contentType = 'image/png',
+                alt = "This is alternate text"
+            )
+        }, deleteFile = F)
+
 
         tableIn <- shiny::reactive({
             if (!is.null(input$bedfile)) {
@@ -494,15 +503,15 @@ runOnDesktop <- function(){
 
         checkDefault <- paste0(1500, 1500, "TRUE", "ensembl", "hg19", "TRUE", 0.3, 0.3, 0.4, 4)
         checkCurent <- shiny::reactive({
-            paste0(input$promLength,input$headLength, input$longestTrxs, input$annotation, input$hg, input$annotationFast, input$thrBeta, input$thrCGIs, input$thrEnhancer, input$colBetaDiff)
+            paste0(input$promLength,input$headLength, input$longestTrxs, input$annotation, input$hg, input$annotationFast, input$thrBeta, input$thrCGIs, input$colBetaDiff)
         })
 
         resultsAnnot <- shiny::eventReactive(input$annotate, {
             if (!is.null(input$bedfile)) {
-                methylO::annotateDMRs(tableIn(), prom.length = input$promLength, head.length = input$headLength, longest.trx = input$longestTrxs, annotation = input$annotation, hg = input$hg, annotation.fast = input$annotationFast, thr.beta = input$thrBeta, thr.cgis = input$thrCGIs, thr.enhancer = input$thrEnhancer, col.betadiff = input$colBetaDiff, col.beta1 = input$betacol1, col.beta2 = input$betacol2)
+                methyl.O::annotateDMRs(tableIn(), prom.length = input$promLength, head.length = input$headLength, longest.trx = input$longestTrxs, annotation = input$annotation, hg = input$hg, annotation.fast = input$annotationFast, thr.beta = input$thrBeta, thr.cgis = input$thrCGIs, col.betadiff = input$colBetaDiff, col.beta1 = input$betacol1, col.beta2 = input$betacol2)
             } else {
                 if (checkDefault != checkCurent()) {
-                    methylO::annotateDMRs(tableIn(), prom.length = input$promLength, head.length = input$headLength, longest.trx = input$longestTrxs, annotation = input$annotation, hg = input$hg, annotation.fast = input$annotationFast, thr.beta = input$thrBeta, thr.cgis = input$thrCGIs, thr.enhancer = input$thrEnhancer, col.betadiff = input$colBetaDiff, col.beta1 = 5, col.beta2 = 6)
+                    methyl.O::annotateDMRs(tableIn(), prom.length = input$promLength, head.length = input$headLength, longest.trx = input$longestTrxs, annotation = input$annotation, hg = input$hg, annotation.fast = input$annotationFast, thr.beta = input$thrBeta, thr.cgis = input$thrCGIs, col.betadiff = input$colBetaDiff, col.beta1 = 5, col.beta2 = 6)
                 } else {
                     readRDS(paste0(libpath, "/data/exampleAnnoTable.RDS"))
                 }
@@ -523,7 +532,7 @@ runOnDesktop <- function(){
 
 
         resultsScore <- shiny::eventReactive(input$annotate,{
-            methylO::scoreAnnotatedDMRs(resultsAnnot(), score.modifier = input$scoreMinMax, active.features = input$scoreFeatureSelected)
+            methyl.O::scoreAnnotatedDMRs(resultsAnnot(), score.modifier = input$scoreMinMax, active.features = input$scoreFeatureSelected)
         })
 
 
@@ -567,7 +576,7 @@ runOnDesktop <- function(){
         })
 
         overviewPlot <- shiny::reactive({
-            methylO::plotMethylationOverview(resultsScore(), opt = input$methylationOverview, col = input$pals)
+            methyl.O::plotMethylationOverview(resultsScore(), plot.type = input$methylationOverview, palette = input$pals)
         })
 
         output$overviewPlot <- shiny::renderPlot({
@@ -753,7 +762,7 @@ runOnDesktop <- function(){
 
         output$downloadData <- shiny::downloadHandler(
             filename = function() {
-                paste0("methylO ", Sys.Date(), ".csv")
+                paste0("methyl.O ", Sys.Date(), ".csv")
             },
             content = function(file) {
                 write.csv(resultsTab(), file)
@@ -771,11 +780,11 @@ runOnDesktop <- function(){
 
         enhancerAnn <- shiny::eventReactive(input$annotateEnh, {
             if (!is.null(input$bedfile)) {
-                methylO::annotateEnhancers(tableIn(), hg = input$hg, thr.beta = input$thr.beta.enhancer, overlap.param.thr = input$overlapParamThrEnhAnnot, param.type = input$paramTypeEnhAnnot, score.modifier = input$scoreModifierenh, col.betadiff = input$colBetaDiff)
+                methyl.O::annotateEnhancers(tableIn(), hg = input$hg, thr.beta = input$thr.beta.enhancer, overlap.param.thr = input$overlapParamThrEnhAnnot, param.type = input$paramTypeEnhAnnot, score.modifier = input$scoreModifierenh, col.betadiff = input$colBetaDiff)
             } else {
                 defaultTableEnh <- readRDS(paste0(libpath, "/data/enhancerExample.RDS"))
                 if (checkDefaultEnh != checkCurentEnh()) {
-                    methylO::annotateEnhancers(tableIn(), hg = input$hg, thr.beta = input$thr.beta.enhancer, overlap.param.thr = input$overlapParamThrEnhAnnot, param.type = input$paramTypeEnhAnnot, score.modifier = input$scoreModifierenh, col.betadiff = input$colBetaDiff)
+                    methyl.O::annotateEnhancers(tableIn(), hg = input$hg, thr.beta = input$thr.beta.enhancer, overlap.param.thr = input$overlapParamThrEnhAnnot, param.type = input$paramTypeEnhAnnot, score.modifier = input$scoreModifierenh, col.betadiff = input$colBetaDiff)
                 } else {
                     defaultTableEnh
                 }
@@ -900,9 +909,9 @@ runOnDesktop <- function(){
         })
 
         methylationVisualizationPlot <- shiny::eventReactive(input$visualizeMeth, {
-            methylO::plotDMRs(resultsScore(),
+            methyl.O::plotDMRs(resultsScore(),
                 input$symbolVisualize,
-                database = input$annotation,
+                annotation = input$annotation,
                 hg = input$hg,
                 beta1.name = betaName1(),
                 beta2.name = betaName2(),
@@ -922,7 +931,7 @@ runOnDesktop <- function(){
 
 
         ### EXPRESSION METHYLATION
-        expression <- shiny::eventReactive(input$correlate, {
+        expressionProfile <- shiny::eventReactive(input$correlate, {
             if (!is.null(input$expressionFile)) {
                 read.table(input$expressionFile$datapath, header = T, stringsAsFactors = F, sep = input$sepExpr)
             } else if (is.null(input$bedfile) & is.null(input$expressionFile)) {
@@ -934,12 +943,12 @@ runOnDesktop <- function(){
         })
 
 
-        if(!is.null(expression)){
+        if(!is.null(expressionProfile)){
 
             metExpressionPlot <- shiny::reactive ({
-                associateFeat2Exprs(
-                    results = resultsScore(), features = input$featureMetExpr,
-                    expression = expression(), col.genes = input$expressionColSymbol,
+                annotatedDMRs2Exprs(
+                    results = resultsScore(), active.features = input$featureMetExpr,
+                    expressionProfile = expressionProfile(), col.genes = input$expressionColSymbol,
                     col.stat = input$expressionColStat, stat.thr = input$expressionStatThr, col.logFC = input$expressionColLogFC, logfc.thr = input$expressionLFCthr, convert.genes = input$convertGeneExpression, convert.from = input$convertGeneExpressionFrom, beta.thr = input$metExprBetaThr,
                     overlap.param.thr = input$overlapParamThr, param.type = input$paramType, line.col = input$colrsMetExpression, lmfit.col1 = input$lmfitCol1, lmfit.col2 = input$lmfitCol2, pal = input$metExpressionPal,
                     plot.type = input$metExpressionPlotType, show.text = input$showText, filter.by.genes = featExprFilt.genes(), cor.type = input$metExpressionCorType, return.table = FALSE
@@ -952,8 +961,8 @@ runOnDesktop <- function(){
 
 
             output$metExpressionTable <- DT::renderDataTable({
-                methylO::associateFeat2Exprs(
-                    results = resultsScore(), features = input$featureMetExpr, expression = expression(),
+                methyl.O::annotatedDMRs2Exprs(
+                    results = resultsScore(), active.features = input$featureMetExpr, expressionProfile = expressionProfile(),
                     col.genes = input$expressionColSymbol,
                     input$expressionColStat, input$expressionStatThr, input$expressionColLogFC, input$expressionLFCthr, input$convertGeneExpression, input$convertGeneExpressionFrom, input$metExprBetaThr,
                     input$overlapParamThr, param.type = input$paramType, input$colrsMetExpression, input$lmfitCol1, input$lmfitCol2, input$metExpressionPal,
@@ -969,9 +978,9 @@ runOnDesktop <- function(){
                 },
                 content = function(file) {
                     pdf(file, width = 13)
-                    methylO::associateFeat2Exprs(
-                        resultsScore(), input$featureMetExpr,
-                        expression = expression(), col.genes = input$expressionColSymbol,
+                    methyl.O::annotatedDMRs2Exprs(
+                        resultsScore(), active.features = input$featureMetExpr,
+                        expressionProfile = expressionProfile(), col.genes = input$expressionColSymbol,
                         col.stat = input$expressionColStat, stat.thr = input$expressionStatThr, col.logFC = input$expressionColLogFC, logfc.thr = input$expressionLFCthr, convert.genes = input$convertGeneExpression, convert.from = input$convertGeneExpressionFrom, beta.thr = input$metExprBetaThr,
                         overlap.param.thr = input$overlapParamThr, param.type = input$paramType, line.col = input$colrsMetExpression, lmfit.col1 = input$lmfitCol1, lmfit.col2 = input$lmfitCol2, pal = input$metExpressionPal,
                         plot.type = input$metExpressionPlotType,show.text = input$showText, filter.by.genes = featExprFilt.genes(), cor.type = input$metExpressionCorType, return.table = FALSE
@@ -1001,8 +1010,8 @@ runOnDesktop <- function(){
         # ENHANCER METHYLATION EXPRESSION
 
         enhExpressionPlot <- shiny::eventReactive(input$correlateEnh, { 
-            methylO::associateEnh2Exprs(
-                enhancerAnn(), expression(), input$hg,
+            methyl.O::annotatedEnh2Exprs(
+                enhancerAnn(), expressionProfile(), input$hg,
                 enhancer.db = input$enhancerDB, col.genes = input$expressionColSymbol, col.stat = input$expressionColStat,
                 stat.thr = input$expressionStatThr, col.logFC = input$expressionColLogFC, logfc.thr = input$expressionLFCthr, convert.genes = input$convertGeneExpression, input$convertGeneExpressionFrom, beta.thr = input$enhExprBetaThr,
                 overlap.param.thr = input$overlapParamThrEnh, param.type = input$paramTypeEnh ,line.col = input$colrsEnhExpression, lmfit.col1 = input$lmfitCol1Enh, lmfit.col2 = input$lmfitCol2Enh, 
@@ -1022,8 +1031,8 @@ runOnDesktop <- function(){
             },
             content <- function(file) {
                 pdf(file, width = 13)
-                methylO::associateEnh2Exprs(
-                    enhancerAnn(), expression(), input$hg,
+                methyl.O::annotatedEnh2Exprs(
+                    enhancerAnn(), expressionProfile(), input$hg,
                     enhancer.db = input$enhancerDB, col.genes = input$expressionColSymbol, col.stat = input$expressionColStat,
                     stat.thr = input$expressionStatThr, col.logFC = input$expressionColLogFC, logfc.thr = input$expressionLFCthr, convert.genes = input$convertGeneExpression, input$convertGeneExpressionFrom, beta.thr = input$enhExprBetaThr,
                     overlap.param.thr = input$overlapParamThrEnh, param.type = input$paramTypeEnh,  line.col = input$colrsEnhExpression, lmfit.col1 = input$lmfitCol1Enh, lmfit.col2 = input$lmfitCol2Enh, 
@@ -1036,8 +1045,8 @@ runOnDesktop <- function(){
 
 
         enhExpressionTable <- shiny::eventReactive(input$correlateEnh, {
-            methylO::associateEnh2Exprs(
-                enhancerAnn(), expression(), input$hg,
+            methyl.O::annotatedEnh2Exprs(
+                enhancerAnn(), expressionProfile(), input$hg,
                 enhancer.db = input$enhancerDB, col.genes = input$expressionColSymbol, col.stat = input$expressionColStat,
                 stat.thr = input$expressionStatThr, col.logFC = input$expressionColLogFC, logfc.thr = input$expressionLFCthr, convert.genes = input$convertGeneExpression, input$convertGeneExpressionFrom, beta.thr = input$enhExprBetaThr,
                 overlap.param.thr = input$overlapParamThrEnh, param.type = input$paramTypeEnh, line.col = input$colrsEnhExpression, lmfit.col1 = input$lmfitCol1Enh, lmfit.col2 = input$lmfitCol2Enh, 
@@ -1081,12 +1090,12 @@ runOnDesktop <- function(){
         # analysis and parsing
         enirchr.results.table.complete <- shiny::eventReactive(input$startEnr, {
             if (!is.null(input$bedfile)) {
-                methylO::annotatedDMRs2Enrichr(resultsAnnot(), active.features = input$activeFeaturesEnr,  stat.filter = input$enrStat, stat.thr = input$enrThr, db = enrMetAnnDBUpdated())
+                methyl.O::annotatedDMRs2Enrichr(resultsAnnot(), active.features = input$activeFeaturesEnr,  stat.filter = input$enrStat, stat.thr = input$enrThr, db = enrMetAnnDBUpdated())
             } else if (is.null(input$bedfile)) {
                 if(checkDefaultEnr==checkCurentEnr()){
                     readRDS(paste0(libpath, "/data/enrichrExample.RDS"))
                 } else {
-                    methylO::annotatedDMRs2Enrichr(resultsAnnot(), active.features = input$activeFeaturesEnr, stat.filter = input$enrStat, stat.thr = input$enrThr, db = enrMetAnnDBUpdated())
+                    methyl.O::annotatedDMRs2Enrichr(resultsAnnot(), active.features = input$activeFeaturesEnr, stat.filter = input$enrStat, stat.thr = input$enrThr, db = enrMetAnnDBUpdated())
                 }
             }
         })
@@ -1144,7 +1153,7 @@ runOnDesktop <- function(){
         )
 
         enrPlot <- shiny::reactive({
-            methylO::plotDMRs2Enrichr(enirchr.results.table.complete(), resultsAnnot(), stat = input$enrStat, n = input$numPlotEnr, plot.type = input$enrhPlotType, pal.col = input$enrhPalCol, col.hyper = input$colEnrPlotHyper, col.hypo = input$colEnrPlotHypo, thrs = as.numeric(unlist(strsplit(input$enrThrPlot,','))), thrs.cols = input$enrThrPlotCol)
+            methyl.O::plotDMRs2Enrichr(enirchr.results.table.complete(), resultsAnnot(), stat = input$enrStat, n = input$numPlotEnr, plot.type = input$enrhPlotType, pal.col = input$enrhPalCol, col.hyper = input$colEnrPlotHyper, col.hypo = input$colEnrPlotHypo, thrs = as.numeric(unlist(strsplit(input$enrThrPlot,','))), thrs.cols = input$enrThrPlotCol)
         })
 
         output$enrPlot <- shiny::renderPlot({
@@ -1158,7 +1167,7 @@ runOnDesktop <- function(){
             },
             content <- function(file) {
                 pdf(file, width = 13)
-                    methylO::plotDMRs2Enrichr(enirchr.results.table.complete(), resultsAnnot(), stat = input$enrStat, n = input$numPlotEnr, plot.type = input$enrhPlotType, pal.col = input$enrhPalCol, col.hyper = input$colEnrPlotHyper, col.hypo = input$colEnrPlotHypo, thrs = as.numeric(unlist(strsplit(input$enrThrPlot, ","))), thrs.cols = input$enrThrPlotCol)
+                    methyl.O::plotDMRs2Enrichr(enirchr.results.table.complete(), resultsAnnot(), stat = input$enrStat, n = input$numPlotEnr, plot.type = input$enrhPlotType, pal.col = input$enrhPalCol, col.hyper = input$colEnrPlotHyper, col.hypo = input$colEnrPlotHypo, thrs = as.numeric(unlist(strsplit(input$enrThrPlot, ","))), thrs.cols = input$enrThrPlotCol)
                 dev.off()
             }
         )
@@ -1167,14 +1176,14 @@ runOnDesktop <- function(){
         ########## TF
         # TFs targets expression correlation
         tfExprCorOut <- shiny::eventReactive(input$startTF,{
-            associateTFs2Exprs(resultsAnnot(), features = input$featureMetTFExpr, expression = expression(), col.genes = input$expressionColSymbol, col.stat = input$expressionColStat, stat.thr = input$expressionStatThrTF, 
+            associateTFs2Exprs(resultsAnnot(), active.features = input$featureMetTFExpr, expressionProfile = expressionProfile(), col.genes = input$expressionColSymbol, col.stat = input$expressionColStat, stat.thr = input$expressionStatThrTF, 
             col.logFC = input$expressionColLogFC, logfc.thr = input$expressionLFCthrTF, 
             convert.genes = input$convertGeneExpression, convert.frominput$convertGeneExpressionFrom,  beta.thr = input$metExprBetaThrTF,
             overlap.param.thr = input$overlapParamThrTF, param.type = input$paramTypeTF)
         })
 
         output$tfExprCorOut <- DT::renderDataTable({
-            DT::datatable(tfExprCorOut())
+            DT::datatable(tfExprCorOut(), rownames = FALSE)
         })
 
         output$downloadTfExprCorOut <- shiny::downloadHandler(
@@ -1189,7 +1198,7 @@ runOnDesktop <- function(){
 
         # TFs meth expression plot
         tfExprsPlotOut <- shiny::eventReactive(input$startTF,{
-            methylO::plotTFs2Exprs(tfExprCorOut(), input$TfSymbol, col.meth = input$colMetTf , pals.bars = input$palTFexprPlot)
+            methyl.O::plotTFs2Exprs(tfExprCorOut(), input$TfSymbol, col.meth = input$colMetTf , pals.bars = input$palTFexprPlot)
         })
 
         output$tfExprsPlotOut <- shiny::renderPlot({
@@ -1208,18 +1217,18 @@ runOnDesktop <- function(){
             },
             content <- function(file) {
                 pdf(file, width = 13)
-                    methylO::plotTFs2Exprs(tfExprCorOut(), input$TfSymbol, col.meth = input$colMetTf , pals.bars = input$palTFexprPlot)
+                    methyl.O::plotTFs2Exprs(tfExprCorOut(), input$TfSymbol, col.meth = input$colMetTf , pals.bars = input$palTFexprPlot)
                 dev.off()
             }
         )
 
         # enrichment df
         enrichrTFsOut <- shiny::eventReactive(input$startTF,{
-            methylO::tfs2Enrichr(tfExprCorOut(), logfc.thr = input$enrLFCthrTF, stat.filter = input$enrStatTFDf, stat.thr = input$enrStatThrTF, db = input$enrMetAnnDBTF)
+            methyl.O::tfs2Enrichr(tfExprCorOut(), logfc.thr = input$enrLFCthrTF, stat.filter = input$enrStatTFDf, stat.thr = input$enrStatThrTF, db = input$enrMetAnnDBTF)
         })
 
         output$enrichrTFsOut <- DT::renderDataTable({
-            DT::datatable(enrichrTFsOut())
+            DT::datatable(enrichrTFsOut(), rownames = FALSE, )
         })
 
         output$downloadEnrichrTFsOut <- shiny::downloadHandler(
@@ -1233,7 +1242,7 @@ runOnDesktop <- function(){
 
         #enrichment plot
         enrPlotTF <- shiny::eventReactive(input$startTF,{
-            methylO::plotDMRs2Enrichr(enrichrTFsOut(), resultsAnnot(), stat = input$enrStatTF, n = input$numPlotEnrTF, plot.type = 'lollipop', pal.col = input$enrhPalColTF, col.hyper = NULL, col.hypo = NULL, thrs = as.numeric(unlist(strsplit(input$enrThrPlotTF, ","))), thrs.cols = input$enrThrPlotColTF)
+            methyl.O::plotDMRs2Enrichr(enrichrTFsOut(), resultsAnnot(), stat = input$enrStatTF, n = input$numPlotEnrTF, plot.type = 'lollipop', pal.col = input$enrhPalColTF, col.hyper = NULL, col.hypo = NULL, thrs = as.numeric(unlist(strsplit(input$enrThrPlotTF, ","))), thrs.cols = input$enrThrPlotColTF)
         })
 
         output$enrPlotTF <- shiny::renderPlot({
@@ -1247,7 +1256,7 @@ runOnDesktop <- function(){
             },
             content <- function(file) {
                 pdf(file, width = 13)
-                    methylO::plotDMRs2Enrichr(enrichrTFsOut(), resultsAnnot(), stat = input$enrStatTF, n = input$numPlotEnrTF, plot.type = 'lollipop', pal.col = input$enrhPalColTF, col.hyper = NULL, col.hypo = NULL, thrs = as.numeric(unlist(strsplit(input$enrThrPlotTF, ","))), thrs.cols = input$enrThrPlotColTF)
+                    methyl.O::plotDMRs2Enrichr(enrichrTFsOut(), resultsAnnot(), stat = input$enrStatTF, n = input$numPlotEnrTF, plot.type = 'lollipop', pal.col = input$enrhPalColTF, col.hyper = NULL, col.hypo = NULL, thrs = as.numeric(unlist(strsplit(input$enrThrPlotTF, ","))), thrs.cols = input$enrThrPlotColTF)
                 dev.off()
             }
         )

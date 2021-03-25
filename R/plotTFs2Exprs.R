@@ -2,18 +2,18 @@
 #'
 #' Barplot of the beta value of TF and the expression of the target genes
 #'
-#' @param associated.table data.frame. Corresponding to resulting data.frame from tfExprsCor().
-#' @param symbol feature to correlate. Must be from names of resulting list from gemMetAnnotations.  Additional feature names can be first exons (exons1) or first intron (intron1). To use more than one feature use c().
-#' @param col.meth color for beta value
-#' @param pals.bars palette for gene expresion
+#' @param associatedTFs2Expr data.frame, results from associateTFs2Exprs().
+#' @param symbol character, feature to correlate. Must be from names of resulting list from annotateDMRs. Additional feature names can be first exons (exons1) or first intron (intron1). To use more than one feature use c().
+#' @param col.meth character, color for beta value. Defaut = "#8e0000" (red)
+#' @param pals.bars character, palette for gene expresion. hcl.pals() to show available. Default = "Cold"
 #' 
 #' @return plot showing methylation levels of TF and expresion of target genes
 #'
 #' @export
 
 
-plotTFs2Exprs <- function(associated.table, symbol, col.meth = '#8e0000', pals.bars = 'Cold'){
-    cur.slice = associated.table[associated.table$symbol %in% symbol,]
+plotTFs2Exprs <- function(associatedTFs2Expr, symbol, col.meth = '#8e0000', pals.bars = 'Cold'){
+    cur.slice = associatedTFs2Expr[associatedTFs2Expr$symbol %in% symbol,]
     cur.tf <- cur.slice[1,1]
     cur.bars <- cur.slice['target.expression']
     cur.bars <- rbind(cur.tf,0,cur.bars)

@@ -1,32 +1,32 @@
-#' Converts methylated genomic dataset in a tracking plot
+#' Converts annotated DMRs in a plot
 #'
 #' This function allows to track in a plot the beta value of a methylated segment mapped on a transcript of the human genome
-#' @param results The results list from getMetAnnotations()
-#' @param symbol Character. Gene symbol to plot.
-#' @param database Character. ensembl or ucsc. Database used to track the plot. Default is Esembl.
-#' @param hg Character. hg19 or hg38. Genome Assembly version. Default is hg19.
-#' @param beta1.name Character. If unsued beta difference is plotted. Character string identifying beta value of first sample in "other" column in results from getMetAnnotations() or indentifying colname in input table used in getMetAnnotations()
-#' @param beta2.name Character. It identifies beta value of second sample in "other" column in results from getMetAnnotations() or it identifies colname in input table used in getMetAnnotations()
-#' @param beta.colors Character vector. Colors of tracks for the first and the second bvalue, respectivetely. Default is c("red", "navy"). If beta diff is plotted, only the first element of vector is considered.
-#' @param blackandwhite Logical. It allows to get all the plot in greyscale. Default is FALSE.
-#' @param show.all.transcripts Logical. If TRUE all transcripts of genes are tracked, if FALSE only the longest transcript is tracked. Default is FALSE.
-#' @param prom.width Integer. Promoter lenght. Default is 1500.
-#' @param path Logical. Path where the plot is saved in a pdf file. If NULL the plot is not saved. Default is NULL.
-#' @param coord.zoom Numeric vector. Coordinates of zoom region. If NULL the plot is not zoomed. Default is NULL.
-#' @param smartzoom Logical. Automatic zoom on the methylated region. Default is TRUE.
-#' @param height.pdf Integer. Height pdf file. Default is 9.
-#' @param width.pdf Integer. Width pdf file. Default is 16.
+#' 
+#' @param annotatedDMRs anotated DMRs list resultingfrom annotateDMRs() or scoreAnnotatedDMRs()
+#' @param symbol character, gene symbol to plot.
+#' @param annotation character, "ensembl" or "ucsc". Annotation used to track the plot. Default = "esembl".
+#' @param hg character, "hg19" or "hg38". Genome Assembly version. Default = "hg19".
+#' @param beta1.name character, if unsued beta difference is plotted. character string identifying beta value of first sample in "other" column in results from annotateDMRs() or indentifying colname in input table used in annotateDMRs()
+#' @param beta2.name character, it identifies beta value of second sample in "other" column in results from annotateDMRs() or it identifies colname in input table used in annotateDMRs()
+#' @param beta.colors character vectors, colors of tracks for the first and the second bvalue, respectivetely. Default is c("red", "navy"). If beta diff is plotted, only the first element of vector is considered.
+#' @param blackandwhite logical, it allows to get all the plot in greyscale. Default = FALSE.
+#' @param show.all.transcripts logical, if TRUE all transcripts of genes are tracked, if FALSE only the longest transcript is tracked. Default = FALSE.
+#' @param prom.width integer, promoter lenght. Default = 1500.
+#' @param path logical, path where the plot is saved in a pdf file. If NULL the plot is not saved. Default = NULL.
+#' @param coord.zoom numeric vectors, coordinates of zoom region. If NULL the plot is not zoomed. Default = NULL.
+#' @param smartzoom logical, automatic zoom on the methylated region. Default = TRUE.
+#' @param height.pdf integer, hight pdf file. Default = 9.
+#' @param width.pdf integer, width pdf file. Default = 16.
 #'
 #' @return Plot of the beta value(s) mapped on transcript(s).
 #'
 #' @export
 
-#script metplot function
-plotDMRs = function(results, symbol, database = "ensembl", hg = "hg19", beta1.name=NULL, beta2.name = NULL, beta.colors = c("red","navy"), blackandwhite = FALSE, show.all.transcripts = FALSE, prom.width = 1500, path = NULL, coord.zoom = NULL, smartzoom = TRUE, height.pdf = 9, width.pdf= 16){
+plotDMRs = function(annotatedDMRs, symbol, annotation = "ensembl", hg = "hg19", beta1.name=NULL, beta2.name = NULL, beta.colors = c("red","navy"), blackandwhite = FALSE, show.all.transcripts = FALSE, prom.width = 1500, path = NULL, coord.zoom = NULL, smartzoom = TRUE, height.pdf = 9, width.pdf= 16){
     symbol <- toupper(symbol)
-    libpath <- paste0(.libPaths()[1], "/metExplorer")
+    libpath <- paste0(.libPaths()[1], "/methyl.O")
     
-    if(database == "ucsc"){
+    if(annotation == "ucsc"){
         txdb = TxDb.Hsapiens.UCSC.hg19.knownGene::TxDb.Hsapiens.UCSC.hg19.knownGene
         cgis = readRDS(paste0(libpath,"/data/CGIs.19.gr.RDS")) # load all CGIs genomic granges
         tab.all.trx = readRDS(paste0(libpath, "/data/txsSelectedAll_UCSC_hg19.RDS")) # load all trx ucsc
@@ -53,7 +53,7 @@ plotDMRs = function(results, symbol, database = "ensembl", hg = "hg19", beta1.na
             cgis = readRDS(paste0(libpath,"/data/CGIs.38.gr.RDS")) # load all CGIs genomic granges
             edb = EnsDb.Hsapiens.v86::EnsDb.Hsapiens.v86
             ensembldb::seqlevelsStyle(edb) <- "UCSC"
-            tab.allTrack.for.Gviz.Ensdb = as.data.frame(readRDS("~/Desktop/metExplorer1/data/AllTrack_for_Gviz_Ensdb86.RDS")) #get all trx track for Gviz ensembl 86
+            tab.allTrack.for.Gviz.Ensdb = readRDS(paste0(libpath, "/data/AllTrack_for_Gviz_Ensdb86.RDS")) #get all trx track for Gviz ensembl 86
             tab.all.trx = readRDS(paste0(libpath,"/data/txsSelectedAll_ENSEMBL_hg38.RDS")) #load all trx ensembl 86
             tab.trx.max = readRDS(paste0(libpath,"/data/txsSelectedLongest_ENSEMBL_hg38.RDS")) #load all trx max ensembl 86
             if(prom.width == 1500){
@@ -65,8 +65,8 @@ plotDMRs = function(results, symbol, database = "ensembl", hg = "hg19", beta1.na
 	}
 
 
-	#filter input results[1] through symbol gene
-	tab.temp <- as.data.frame(results[[1]])
+	#filter input annotatedDMRs[1] through symbol gene
+	tab.temp <- as.data.frame(annotatedDMRs[[1]])
 	tab.temp <- tab.temp[which(tab.temp$symbol %in% symbol), ]
 	ind.rmv <- which(duplicated(tab.temp[, c(1:3)]))
 	if (length(ind.rmv)) {
@@ -279,7 +279,7 @@ plotDMRs = function(results, symbol, database = "ensembl", hg = "hg19", beta1.na
 
 	#track for tracking trx / trxs
 	suppressWarnings(
-        if(database == "ucsc"){
+        if(annotation == "ucsc"){
             if(show.all.transcripts){
               if(blackandwhite){
                 track.gene.transcript <- Gviz::GeneRegionTrack(txdb, genome = hg, chromosome = chr.gene, name = symbol, start = str.gene, end = end.gene)

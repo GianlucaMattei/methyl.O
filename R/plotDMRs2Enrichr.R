@@ -2,22 +2,22 @@
 #'
 #' Visualize enrichment results and the contributes of hyper-metyhlated and hypo-methylated genes.
 #'
-#' @param enrichr.results resulting list from enrichrMetAnnotations().
-#' @param annot.results anotated results list from getMetAnnotations() or scoreMets().
-#' @param stat character indicating the statistics to visualize. Accepted "P.value", "Adjusted.P.value" or "Overlap". Default 'P.value'.
-#' @param n numeric. Value indicating the number of enrichment to plot, starting from the most enriched, to visualize. Default 25.
-#' @param plot.type character indicating the plot type to vistalize. Accepted 'barplot' 'lollipop'. Default 'barplot'.
-#' @param col.hyper character indicating the color representing hyper-methylated genes. Default 'Grey70'.
-#' @param col.hypo character indicating the color representing hyper-methylated genes. Default 'Grey30'.
-#' @param pal.col character indicating the palette color for plot.type = 'lollipop'. Must be one from hcl.pals(). Default 'Dynamic'.
-#' @param thrs numeric vector for stat thresholds to plot. Default c(0.01, 0.05)
-#' @param thrs.cols characters vector indicating the colors to use for thresholds. Default c('green', "yellow").
+#' @param enrichr.results data.frame resulting list from annotatedDMTs2Enrichr().
+#' @param annotatedDMRs anotated DMRs list resultingfrom annotateDMRs() or scoreAnnotatedDMRs()
+#' @param stat character, statistics to visualize. Accepted "P.value", "Adjusted.P.value" or "Overlap". Default = 'P.value'.
+#' @param n numeric, value indicating the number of enrichment to plot, starting from the most enriched, to visualize. Default = 25.
+#' @param plot.type  character, compute or not different linear models for upregulated and downregulated genes. Accepted: "simple" or "splitted". Default = "splitted".
+#' @param col.hyper character, the color representing hyper-methylated genes. Default = 'Grey70'.
+#' @param col.hypo character, the color representing hyper-methylated genes. Default = 'Grey30'.
+#' @param pal.col character, the palette color for plot.type = 'lollipop'. Must be one from hcl.pals(). Default = 'Dynamic'.
+#' @param thrs numeric vectors, statistical thresholds to plot. Default = c(0.01, 0.05)
+#' @param thrs.cols characters vector, the colors to use for thresholds. Default = c('green', "yellow").
 #'
-#' @return plot
+#' @return plot of enrichR results
 #'
 #' @export
 
-plotDMRs2Enrichr <- function(enrichr.results, annot.results, stat="P.value" , n = 25, plot.type = "barplot", pal.col = "Dynamic", col.hyper  = "#ff0000", col.hypo = "#00b3ff", thrs = c(0.01, 0.05), thrs.cols = c("green", "yellow")){
+plotDMRs2Enrichr <- function(enrichr.results, annotatedDMRs, stat="P.value" , n = 25, plot.type = "barplot", pal.col = "Dynamic", col.hyper  = "#ff0000", col.hypo = "#00b3ff", thrs = c(0.01, 0.05), thrs.cols = c("green", "yellow")){
 
     if(!any((.packages()) %in% "enrichR")){
         library(enrichR)
@@ -36,7 +36,7 @@ plotDMRs2Enrichr <- function(enrichr.results, annot.results, stat="P.value" , n 
             } else { 
                 cur.stat <- -log10(enrichr.results[i, stat])
             }
-            cur.beta <- annot.results[[1]][which(annot.results[[1]]$symbol %in% cur.genes), "beta"]
+            cur.beta <- annotatedDMRs[[1]][which(annotatedDMRs[[1]]$symbol %in% cur.genes), "beta"]
 
             pos.tot <- sum(cur.beta > 0)
             if (pos.tot > 0) {

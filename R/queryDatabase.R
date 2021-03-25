@@ -2,26 +2,26 @@
 #' 
 #' Query elements of resulting annotations list to specified database in order to find pathogenic genes.
 #'  
-#' @param table element of results list from annotatedDMRs()
-#' @param database the database to query
-#' @param return.table optition to return a table instead a vector of presence
-#' @param hold.columns column positions to hold when return.table=TRUE
-#' @param is.genomic.ranges specifies if database is a GenomicRange objet or a data.frame
-#' @param thr beta value threshold   
+#' @param DMRsRanges DMRs ranges
+#' @param db character, database to query
+#' @param return.table logical, optition to return a table instead a vector of presence. Default = TRUE
+#' @param hold.columns numeric vectors, column positions to hold when return.table=TRUE
+#' @param is.genomic.ranges logical, specifies if database is a GenomicRange objet or a data.frame. Default = FALSE
+#' @param thr numeric, threshold for beta difference values. Default = 0
 #' 
 #' @return a vector of presence or a data.frame 
 #' 
 #' @export
 
-queryDatabase <- function(table, database, return.table = TRUE, hold.columns, is.genomic.ranges = FALSE, thr=0) {
+queryDatabase <- function(DMRsRanges, db, return.table = TRUE, hold.columns, is.genomic.ranges = FALSE, thr=0) {
 
     # make Genomic Ranges
-    gene.annotations.ranges <- GenomicRanges::makeGRangesFromDataFrame(table, keep.extra.columns = TRUE)
+    gene.annotations.ranges <- GenomicRanges::makeGRangesFromDataFrame(DMRsRanges, keep.extra.columns = TRUE)
 
     if(is.genomic.ranges==FALSE){
-        database.ranges <- GenomicRanges::makeGRangesFromDataFrame(database, keep.extra.columns = TRUE)
+        database.ranges <- GenomicRanges::makeGRangesFromDataFrame(db, keep.extra.columns = TRUE)
     } else if(is.genomic.ranges==TRUE) {
-        database.ranges <- database
+        database.ranges <- db
     }
 
     # overlaps features/DB
@@ -56,7 +56,7 @@ queryDatabase <- function(table, database, return.table = TRUE, hold.columns, is
         intrsct <- GenomicRanges::pintersect(gene.annotations.ranges.parsed, database.ranges.parsed)
         overlap.lengths <- S4Vectors::width(intrsct) / S4Vectors::width(database.ranges.parsed)
         ind.hold <- (overlap.lengths) >= thr
-        vector.presence <- rep(0, nrow(table))
+        vector.presence <- rep(0, nrow(DMRsRanges))
         if(any(ind.hold)){
             vector.presence[S4Vectors::queryHits(hits)[ind.hold]] <- 1
         }

@@ -1,27 +1,26 @@
-#' Annotates the methylation profiles. 
+#' Annotates the the differentially methylated regions.
 #' 
-#' Annotate the differentially methylated regions 
+#' Maps DMRs on genes returning a list for each features.
 #'  
-#' @param table the input table, it must have the following columns: chr, start, end, beta diff. Other columns will be stored in the resulting output under the column other.
-#' @param prom.length length of promoters
-#' @param head.length length of the first part of the gene, named head, starting from the TSS. If longer than the gene, the entire txs will be considered as head. 
-#' @param longest.trx option to use the longest transcript to represent the gene
-#' @param annotation Ensembl or UCSC
-#' @param hg genome assembly version
-#' @param annotation.fast 1:1 mapping or 1:many - many:1 - many:many mapping
-#' @param thr.beta the beta difference threshold to consider methylations. Default = 0.3
-#' @param thr.cgis the length, in percentage, of methylated CGIs in order to be considered altered. Default = 0.4
-#' @param thr.enhancer the length in percentage of methylated enhancer in order to be considered altered. Default = 0.4
-#' @param col.betadiff the column position for beta diff. in input table. Default = 4
-#' @param col.beta1 the column position for first sample beta values in input table
-#' @param col.beta2 the column position for second sample beta values in input table
+#' @param DMRsRanges data.frame, the DMRs ranges, it must have the following columns: chr, start, end, beta diff. Other columns will be stored in the resulting output under the column other.
+#' @param prom.length numeric, length of promoters. Default = 1500
+#' @param head.length numeric, length of the first part of the gene, named head, starting from the TSS. If longer than the gene, the entire txs will be considered as head. Default = 1500
+#' @param longest.trx logical, option to use the longest transcript to represent the gene
+#' @param annotation character, database to use for transcripts mapping. Available "ensembl" or "ucsc". Default ="ensembl"
+#' @param hg character, Available "hg19", "hg38". Genome assembly version. Default = "hg19"
+#' @param annotation.fast logical, compute 1:1 mapping or 1:many - many:1 - many:many mapping. Default = TRUE
+#' @param thr.beta numeric, beta difference threshold to consider methylations. Default = 0.3
+#' @param thr.cgis numeric, length, in percentage, of methylated CGIs in order to be considered altered. Default = 0.4
+#' @param col.betadiff nuemric, column position for beta diff. in input table. Default = 4
+#' @param col.beta1 numeric, column position for first sample beta values in input table
+#' @param col.beta2 numeric, column position for second sample beta values in input table
 #' 
-#' @return list of annotated table
+#' @return list, features overlapped by annotated DMRs
 #' 
 #' @export
 
-annotateDMRs = function(table , prom.length=1500, head.length=1500, longest.trx=TRUE, annotation='ensembl', hg='hg19', annotation.fast=TRUE, thr.beta=.3, thr.cgis=.4, thr.enhancer=.4, col.betadiff = 4, col.beta1 = NULL, col.beta2 = NULL) {
-    libpath <- paste0(.libPaths()[1], "/metExplorer")
+annotateDMRs = function(DMRsRanges , prom.length=1500, head.length=1500, longest.trx=TRUE, annotation='ensembl', hg='hg19', annotation.fast=TRUE, thr.beta=.3, thr.cgis=.4, col.betadiff = 4, col.beta1 = NULL, col.beta2 = NULL) {
+    libpath <- paste0(.libPaths()[1], "/methyl.O")
 
     ncg <- read.table(sep = "\t", stringsAsFactors = F, header = T, paste0(libpath, "/data/pathsToGene_NCG.tsv"))
     cosmic <- readRDS(file = paste0(libpath,"/data/DB.COSMIC.RDS"))
@@ -29,14 +28,12 @@ annotateDMRs = function(table , prom.length=1500, head.length=1500, longest.trx=
     if (hg == "hg19") {
         cosmic.CGIs <- readRDS(paste0(libpath,"/data/CGIs.19.comsic.positions.gr.RDS"))
         cgis <- readRDS(paste0(libpath,"/data/CGIs.19.gr.RDS"))
-        hacer <- readRDS(paste0(libpath,"/data/hacer.all.enhancer.hg19.gr.RDS"))
         gnomad <- readRDS(file = paste0(libpath,"/data/DB.gnomad.hg19.RDS"))
         dgv <- readRDS(file = paste0(libpath,"/data/DB.DGV.hg19.RDS"))
 
     } else if (hg == "hg38") {
         cosmic.CGIs <- readRDS(paste0(libpath,"/data/CGIs.38.comsic.positions.gr.RDS"))
         cgis <- readRDS(paste0(libpath,"/data/CGIs.38.gr.RDS"))
-        hacer <- readRDS(paste0(libpath,"/data/hacer.all.enhancer.hg19.gr.RDS"))
         gnomad <- readRDS(file = paste0(libpath,"/data/DB.gnomad.hg38.RDS"))
         dgv <- readRDS(file = paste0(libpath,"/data/DB.DGV.hg38.RDS"))
     }
@@ -68,10 +65,10 @@ annotateDMRs = function(table , prom.length=1500, head.length=1500, longest.trx=
 
     results <- list()
 
-    table <- formatDMRsInput(table, thr.beta = .3, col.betadiff = col.betadiff, col.beta1 = col.beta1, col.beta2 = col.beta2)
+    DMRs <- formatDMRsInput(DMRsRanges, thr.beta = .3, col.betadiff = col.betadiff, col.beta1 = col.beta1, col.beta2 = col.beta2)
 
     # creating granges
-    table.ranges <- GenomicRanges::makeGRangesFromDataFrame(table, keep.extra.columns = TRUE)
+    DMRs.ranges <- GenomicRanges::makeGRangesFromDataFrame(DMRs, keep.extra.columns = TRUE)
 
     # longest transcipts
     if(annotation == 'ensembl'){
@@ -104,31 +101,30 @@ annotateDMRs = function(table , prom.length=1500, head.length=1500, longest.trx=
     # overlap annotations and Mets
     annotated.table <- data.frame()
     default.colnames <- c("seqnames", "start", "end", "width", "beta", "others", "gene.start", "gene.end", "gene.width", "gene.strand", "gene.id", "tx.name", "genes.perc", "tag")
-    hits <- GenomicRanges::findOverlaps(db.genes, table.ranges)
-    table.overlapping <- data.frame(table.ranges[S4Vectors::subjectHits(hits), ], stringsAsFactors = F)[, -5]
+    hits <- GenomicRanges::findOverlaps(db.genes, DMRs.ranges)
+    table.overlapping <- data.frame(DMRs.ranges[S4Vectors::subjectHits(hits), ], stringsAsFactors = F)[, -5]
     db.genes.overlapping <- data.frame(db.genes[S4Vectors::queryHits(hits), ], stringsAsFactors = F)
     if(length(hits)>0){
         colnames(db.genes.overlapping)[2:6] <- c("gene.start", "gene.end", "gene.width", "gene.strand", "gene.id")
         annotated.table <- cbind(table.overlapping, db.genes.overlapping[, c("gene.start","gene.end", "gene.width","gene.strand","gene.id","tx.name")])
-        overlaps <- GenomicRanges::pintersect(db.genes[S4Vectors::queryHits(hits), ], table.ranges[S4Vectors::subjectHits(hits), ])
+        overlaps <- GenomicRanges::pintersect(db.genes[S4Vectors::queryHits(hits), ], DMRs.ranges[S4Vectors::subjectHits(hits), ])
         width.overlap <- S4Vectors::width(overlaps)
         annotated.table <- cbind(annotated.table, genes.perc = width.overlap / S4Vectors::width(db.genes[S4Vectors::queryHits(hits), ]) * 100)
         annotated.table$tag <- apply(annotated.table,1,function(x){gsub(' +', '', paste0(x[1:3], collapse='_'))})
-        annotated.table.ranges <- GenomicRanges::makeGRangesFromDataFrame(annotated.table, keep.extra.columns = TRUE)
+        annotated.DMRs.ranges <- GenomicRanges::makeGRangesFromDataFrame(annotated.table, keep.extra.columns = TRUE)
     }
 
     results$genes <- annotated.table
 
     # databases overlap and database-score
     if (nrow(results$genes) > 0) {
-        results$genes$dgv <- metExplorer::queryDatabase(results$genes, dgv, return.table = FALSE)
-        results$genes$gnomad <- metExplorer::queryDatabase(results$genes, gnomad, return.table = FALSE)
+        results$genes$dgv <- methyl.O::queryDatabase(results$genes, dgv, return.table = FALSE)
+        results$genes$gnomad <- methyl.O::queryDatabase(results$genes, gnomad, return.table = FALSE)
         results$genes$NCG <- NA
         results$genes$NCG_type <- NA
         results$genes$COSMIC <- as.numeric(results$genes$gene.id %in% cosmic$ID)
-        results$genes$cosmic.CGIs <- metExplorer::queryDatabase(results$genes, cosmic.CGIs, return.table = FALSE, is.genomic.ranges = TRUE,thr=thr.cgis)
-        results$genes$hacer <- metExplorer::queryDatabase(results$genes, hacer, return.table = FALSE, thr = thr.enhancer)
-        results$genes$CGIs <- metExplorer::queryDatabase(results$genes, cgis, return.table = FALSE, ,thr=thr.cgis)
+        results$genes$cosmic.CGIs <- methyl.O::queryDatabase(results$genes, cosmic.CGIs, return.table = FALSE, is.genomic.ranges = TRUE,thr=thr.cgis)
+        results$genes$CGIs <- methyl.O::queryDatabase(results$genes, cgis, return.table = FALSE, ,thr=thr.cgis)
     }
 
 
@@ -157,12 +153,12 @@ annotateDMRs = function(table , prom.length=1500, head.length=1500, longest.trx=
     # overlap annotations and Mets
     annotated.table.head <- data.frame()
     default.colnames <- c("seqnames", "start", "end", "width", "beta", "others", "head.start", "head.end", "head.width", "gene.strand", "gene.id", "tx.name", "overlap.perc.head", "tag")
-    hits <- GenomicRanges::findOverlaps(db.genes.head, table.ranges)
-    table.overlapping <- data.frame(table.ranges[S4Vectors::subjectHits(hits), ], stringsAsFactors = F)[, -5]
+    hits <- GenomicRanges::findOverlaps(db.genes.head, DMRs.ranges)
+    table.overlapping <- data.frame(DMRs.ranges[S4Vectors::subjectHits(hits), ], stringsAsFactors = F)[, -5]
     db.genes.head.overlapping <- data.frame(db.genes.head[S4Vectors::queryHits(hits), ], stringsAsFactors = F)
     if(length(hits)>0){
         colnames(db.genes.head.overlapping)[2:6] <- c("head.start", "head.end", "overlap.width.head", "gene.strand", "gene.id")
-        overlaps <- GenomicRanges::pintersect(db.genes.head[S4Vectors::queryHits(hits), ], table.ranges[S4Vectors::subjectHits(hits), ])
+        overlaps <- GenomicRanges::pintersect(db.genes.head[S4Vectors::queryHits(hits), ], DMRs.ranges[S4Vectors::subjectHits(hits), ])
         width.overlap <- S4Vectors::width(overlaps)
         annotated.table.head <- cbind(table.overlapping, db.genes.head.overlapping[, c("head.start","head.end", "overlap.width.head","gene.strand","gene.id","tx.name")])
 
@@ -175,14 +171,13 @@ annotateDMRs = function(table , prom.length=1500, head.length=1500, longest.trx=
 
     # databases overlap and database-score
     if (nrow(results$heads) > 0) {
-        results$heads$dgv <- metExplorer::queryDatabase(results$heads, dgv, return.table = FALSE)
-        results$heads$gnomad <- metExplorer::queryDatabase(results$heads, gnomad, return.table = FALSE)
+        results$heads$dgv <- methyl.O::queryDatabase(results$heads, dgv, return.table = FALSE)
+        results$heads$gnomad <- methyl.O::queryDatabase(results$heads, gnomad, return.table = FALSE)
         results$heads$NCG <- NA
         results$heads$NCG_type <- NA
         results$heads$COSMIC <- as.numeric(results$heads$gene.id %in% cosmic$ID)
-        results$heads$cosmic.CGIs <- metExplorer::queryDatabase(results$heads, cosmic.CGIs, return.table = FALSE, is.genomic.ranges = TRUE,thr=thr.cgis)
-        results$heads$hacer <- metExplorer::queryDatabase(results$heads, hacer, return.table = FALSE, thr = thr.enhancer)
-        results$heads$CGIs <- metExplorer::queryDatabase(results$heads, cgis, return.table = FALSE, ,thr=thr.cgis)
+        results$heads$cosmic.CGIs <- methyl.O::queryDatabase(results$heads, cosmic.CGIs, return.table = FALSE, is.genomic.ranges = TRUE,thr=thr.cgis)
+        results$heads$CGIs <- methyl.O::queryDatabase(results$heads, cgis, return.table = FALSE, ,thr=thr.cgis)
     }
 
 
@@ -210,9 +205,9 @@ annotateDMRs = function(table , prom.length=1500, head.length=1500, longest.trx=
     annotated.table.exons <- data.frame()
     default.exons.colnames <- c("seqnames", "start", "end", "width", "beta", "gene.id", "others", "exon.start", "exon.end", "exon.width", "strand", "rank", "tx.name", "overlap.width.ex", "overlap.perc.ex", "tag")
 
-    hits <- GenomicRanges::findOverlaps(db.exons.ranges.unlist, table.ranges)
-    annotated.table.ranges.overlapping <- table.ranges[S4Vectors::subjectHits(hits), ]
-    table.exons.overlapping <- data.frame(annotated.table.ranges.overlapping, stringsAsFactors = F)[, -5]
+    hits <- GenomicRanges::findOverlaps(db.exons.ranges.unlist, DMRs.ranges)
+    annotated.DMRs.ranges.overlapping <- DMRs.ranges[S4Vectors::subjectHits(hits), ]
+    table.exons.overlapping <- data.frame(annotated.DMRs.ranges.overlapping, stringsAsFactors = F)[, -5]
     db.exons.ranges.overlapping <- db.exons.ranges.unlist[S4Vectors::queryHits(hits), ]
     db.exons.overlapping <- data.frame(db.exons.ranges.overlapping, tx.name=names(db.exons.ranges.overlapping), stringsAsFactors = F)
     db.exons.overlapping <- db.exons.overlapping[, c("start", "end", "width", "strand", "exon_rank", "tx.name")]
@@ -244,14 +239,13 @@ annotateDMRs = function(table , prom.length=1500, head.length=1500, longest.trx=
 
     # databases overlap and database-score
     if (nrow(results$exons) > 0) {
-        results$exons$dgv <- metExplorer::queryDatabase(results$exons, dgv, return.table = FALSE)
-        results$exons$gnomad <- metExplorer::queryDatabase(results$exons, gnomad, return.table = FALSE)
+        results$exons$dgv <- methyl.O::queryDatabase(results$exons, dgv, return.table = FALSE)
+        results$exons$gnomad <- methyl.O::queryDatabase(results$exons, gnomad, return.table = FALSE)
         results$exons$NCG <- NA
         results$exons$NCG_type <- NA
         results$exons$COSMIC <- as.numeric(results$exons$gene.id %in% cosmic$ID)
-        results$exons$cosmic.CGIs <- metExplorer::queryDatabase(results$exons, cosmic.CGIs, return.table = FALSE, is.genomic.ranges = TRUE, , thr = thr.cgis)
-        results$exons$hacer <- metExplorer::queryDatabase(results$exons, hacer, return.table = FALSE,thr=thr.enhancer)
-        results$exons$CGIs <- metExplorer::queryDatabase(results$exons, cgis, return.table = FALSE,thr=thr.cgis)
+        results$exons$cosmic.CGIs <- methyl.O::queryDatabase(results$exons, cosmic.CGIs, return.table = FALSE, is.genomic.ranges = TRUE, , thr = thr.cgis)
+        results$exons$CGIs <- methyl.O::queryDatabase(results$exons, cgis, return.table = FALSE,thr=thr.cgis)
     }
 
 
@@ -273,10 +267,10 @@ annotateDMRs = function(table , prom.length=1500, head.length=1500, longest.trx=
     default.threes.colnames <- c("seqnames", "start", "end", "width", "beta", "gene.id", "others", "three.start", "three.end", "three.width", "strand", "rank", "tx.name", "overlap.width.three", "overlap.perc.three", "tag")
 
     # FIVE
-    hits <- GenomicRanges::findOverlaps(db.five.ranges, table.ranges)
-    annotated.table.ranges.overlapping <- table.ranges[S4Vectors::subjectHits(hits), ]
+    hits <- GenomicRanges::findOverlaps(db.five.ranges, DMRs.ranges)
+    annotated.DMRs.ranges.overlapping <- DMRs.ranges[S4Vectors::subjectHits(hits), ]
     if(length(S4Vectors::subjectHits(hits))>0){
-        table.fives.overlapping <- data.frame(annotated.table.ranges.overlapping, stringsAsFactors = F)[, -5]
+        table.fives.overlapping <- data.frame(annotated.DMRs.ranges.overlapping, stringsAsFactors = F)[, -5]
         db.fives.ranges.overlapping <- db.five.ranges[S4Vectors::queryHits(hits), ]
         db.fives.overlapping <- data.frame(db.fives.ranges.overlapping, tx.name=names(db.fives.ranges.overlapping), stringsAsFactors = F)
         db.fives.overlapping <- db.fives.overlapping[, c("start", "end", "width", "strand", "exon_rank", "tx.name")]
@@ -301,10 +295,10 @@ annotateDMRs = function(table , prom.length=1500, head.length=1500, longest.trx=
 
 
     # THREE
-    hits <- GenomicRanges::findOverlaps(db.three.ranges, table.ranges)
-    annotated.table.ranges.overlapping <- table.ranges[S4Vectors::subjectHits(hits), ]
+    hits <- GenomicRanges::findOverlaps(db.three.ranges, DMRs.ranges)
+    annotated.DMRs.ranges.overlapping <- DMRs.ranges[S4Vectors::subjectHits(hits), ]
     if(length(S4Vectors::subjectHits(hits))>0){
-        table.threes.overlapping <- data.frame(annotated.table.ranges.overlapping, stringsAsFactors = F)[, -5]
+        table.threes.overlapping <- data.frame(annotated.DMRs.ranges.overlapping, stringsAsFactors = F)[, -5]
         db.threes.ranges.overlapping <- db.three.ranges[S4Vectors::queryHits(hits), ]
         db.threes.overlapping <- data.frame(db.threes.ranges.overlapping, tx.name=names(db.threes.ranges.overlapping), stringsAsFactors = F)
         db.threes.overlapping <- db.threes.overlapping[, c("start", "end", "width", "strand", "exon_rank", "tx.name")]
@@ -325,61 +319,29 @@ annotateDMRs = function(table , prom.length=1500, head.length=1500, longest.trx=
         annotated.table.threes$tag = apply(annotated.table.threes,1, function(x) {gsub(' +', '', paste0(x[1:3], collapse='_'))})
     }
 
-
-    # distances from 'intron-five' junction
-    if(nrow(annotated.table.fives)>0){
-
-        distances <- cbind(annotated.table.fives["start"] - annotated.table.fives["five.start"], annotated.table.fives["five.end"] - annotated.table.fives["end"])
-        colnames(distances) <- c("distance.left", "distance.right")
-        annotated.table.fives <- cbind(annotated.table.fives, distances)
-
-        if(any(colnames(annotated.table.fives) %in% "others")){
-            annotated.table.fives <- cbind(annotated.table.fives[, -match("others", colnames(annotated.table.fives))], others = annotated.table.fives[, match("others", colnames(annotated.table.fives))])
-        } else {
-            annotated.table.fives$others <- ""
-        }
-    }
-
     results$fiveUTRs <- annotated.table.fives
-
-    # distances from 'intron-three' junction
-    if(nrow(annotated.table.threes)>0){
-
-        distances <- cbind(annotated.table.threes["start"] - annotated.table.threes["three.start"], annotated.table.threes["three.end"] - annotated.table.threes["end"])
-        colnames(distances) <- c("distance.left", "distance.right")
-        annotated.table.threes <- cbind(annotated.table.threes, distances)
-
-        if(any(colnames(annotated.table.threes) %in% "others")){
-            annotated.table.threes <- cbind(annotated.table.threes[, -match("others", colnames(annotated.table.threes))], others = annotated.table.threes[, match("others", colnames(annotated.table.threes))])
-        } else {
-            annotated.table.threes$others <- ""
-        }
-    }
-
     results$threeUTRs <- annotated.table.threes
 
 
     # databases overlap and database-score
     if (nrow(results$fiveUTRs) > 0) {
-        results$fiveUTRs$dgv <- metExplorer::queryDatabase(results$fiveUTRs, dgv, return.table = FALSE)
-        results$fiveUTRs$gnomad <- metExplorer::queryDatabase(results$fiveUTRs, gnomad, return.table = FALSE)
+        results$fiveUTRs$dgv <- methyl.O::queryDatabase(results$fiveUTRs, dgv, return.table = FALSE)
+        results$fiveUTRs$gnomad <- methyl.O::queryDatabase(results$fiveUTRs, gnomad, return.table = FALSE)
         results$fiveUTRs$NCG <- NA
         results$fiveUTRs$NCG_type <- NA
         results$fiveUTRs$COSMIC <- as.numeric(results$fiveUTRs$gene.id %in% cosmic$ID)
-        results$fiveUTRs$cosmic.CGIs <- metExplorer::queryDatabase(results$fiveUTRs, cosmic.CGIs, return.table = FALSE, is.genomic.ranges = TRUE, , thr = thr.cgis)
-        results$fiveUTRs$hacer <- metExplorer::queryDatabase(results$fiveUTRs, hacer, return.table = FALSE, thr = thr.enhancer)
-        results$fiveUTRs$CGIs <- metExplorer::queryDatabase(results$fiveUTRs, cgis, return.table = FALSE, thr = thr.cgis)
+        results$fiveUTRs$cosmic.CGIs <- methyl.O::queryDatabase(results$fiveUTRs, cosmic.CGIs, return.table = FALSE, is.genomic.ranges = TRUE, , thr = thr.cgis)
+        results$fiveUTRs$CGIs <- methyl.O::queryDatabase(results$fiveUTRs, cgis, return.table = FALSE, thr = thr.cgis)
     }
 
     if (nrow(results$threeUTRs) > 0) {
-        results$threeUTRs$dgv <- metExplorer::queryDatabase(results$threeUTRs, dgv, return.table = FALSE)
-        results$threeUTRs$gnomad <- metExplorer::queryDatabase(results$threeUTRs, gnomad, return.table = FALSE)
+        results$threeUTRs$dgv <- methyl.O::queryDatabase(results$threeUTRs, dgv, return.table = FALSE)
+        results$threeUTRs$gnomad <- methyl.O::queryDatabase(results$threeUTRs, gnomad, return.table = FALSE)
         results$threeUTRs$NCG <- NA
         results$threeUTRs$NCG_type <- NA
         results$threeUTRs$COSMIC <- as.numeric(results$threeUTRs$gene.id %in% cosmic$ID)
-        results$threeUTRs$cosmic.CGIs <- metExplorer::queryDatabase(results$threeUTRs, cosmic.CGIs, return.table = FALSE, is.genomic.ranges = TRUE, thr = thr.cgis)
-        results$threeUTRs$hacer <- metExplorer::queryDatabase(results$threeUTRs, hacer, return.table = FALSE, thr = thr.enhancer)
-        results$threeUTRs$CGIs <- metExplorer::queryDatabase(results$threeUTRs, cgis, return.table = FALSE, thr = thr.cgis)
+        results$threeUTRs$cosmic.CGIs <- methyl.O::queryDatabase(results$threeUTRs, cosmic.CGIs, return.table = FALSE, is.genomic.ranges = TRUE, thr = thr.cgis)
+        results$threeUTRs$CGIs <- methyl.O::queryDatabase(results$threeUTRs, cgis, return.table = FALSE, thr = thr.cgis)
     }
 
 
@@ -396,9 +358,9 @@ annotateDMRs = function(table , prom.length=1500, head.length=1500, longest.trx=
     annotated.table.proms <- data.frame()
     annotated.proms.table.colnames <- c("seqnames", "start", "end", "width", "strand", "beta", "others", "gene.id", "prom.start", "prom.end", "prom.width", "tx.name", "overlap.width.prom", "overlap.perc.prom", "tag")
 
-    hits <- GenomicRanges::findOverlaps(db.proms.ranges, table.ranges)
+    hits <- GenomicRanges::findOverlaps(db.proms.ranges, DMRs.ranges)
     prom.overlapping.ranges <- db.proms.ranges[S4Vectors::queryHits(hits), ]
-    table.prom.overlapping <- table.ranges[S4Vectors::subjectHits(hits), ]
+    table.prom.overlapping <- DMRs.ranges[S4Vectors::subjectHits(hits), ]
     table.prom.overlapping <- data.frame(table.prom.overlapping)
     table.prom.overlapping$tag <- apply(table.prom.overlapping, 1, function(x) {
         gsub(" +", "", paste0(x[1:3], collapse = "_"))
@@ -412,7 +374,6 @@ annotateDMRs = function(table , prom.length=1500, head.length=1500, longest.trx=
     annotated.table.proms <- cbind(table.prom.overlapping[,c("seqnames", "start", "end", "width", "beta", "others", "tag")], prom.overlapping.df[, c("prom.start", "prom.end","prom.width","strand", "gene.id", "tx.name")],overlap.width.prom = width.overlap, overlap.perc.prom = percent.overlap)
     annotated.table.proms <- annotated.table.proms[, annotated.proms.table.colnames]
 
-    # # distances from junction
 
     if(length(annotated.table.proms$others)>0){
         results$promoters <- cbind(annotated.table.proms[,-7], others = annotated.table.proms[, "others"])
@@ -422,14 +383,13 @@ annotateDMRs = function(table , prom.length=1500, head.length=1500, longest.trx=
 
     # databases overlap and database-score
     if (nrow(results$promoters) > 0) {
-        results$promoters$dgv <- metExplorer::queryDatabase(results$promoters, dgv, return.table = FALSE)
-        results$promoters$gnomad <- metExplorer::queryDatabase(results$promoters, gnomad, return.table = FALSE)
+        results$promoters$dgv <- methyl.O::queryDatabase(results$promoters, dgv, return.table = FALSE)
+        results$promoters$gnomad <- methyl.O::queryDatabase(results$promoters, gnomad, return.table = FALSE)
         results$promoters$NCG <- NA
         results$promoters$NCG_type <- NA
         results$promoters$COSMIC <- as.numeric(results$promoters$gene.id %in% cosmic$ID)
-        results$promoters$cosmic.CGIs <- metExplorer::queryDatabase(results$promoters, cosmic.CGIs, return.table = FALSE, is.genomic.ranges = TRUE, thr = thr.cgis)
-        results$promoters$hacer <- metExplorer::queryDatabase(results$promoters, hacer, return.table = FALSE,thr=thr.enhancer)
-        results$promoters$CGIs <- metExplorer::queryDatabase(results$promoters, cgis, return.table = FALSE, thr = thr.cgis)
+        results$promoters$cosmic.CGIs <- methyl.O::queryDatabase(results$promoters, cosmic.CGIs, return.table = FALSE, is.genomic.ranges = TRUE, thr = thr.cgis)
+        results$promoters$CGIs <- methyl.O::queryDatabase(results$promoters, cgis, return.table = FALSE, thr = thr.cgis)
     }
 
 
@@ -446,9 +406,9 @@ annotateDMRs = function(table , prom.length=1500, head.length=1500, longest.trx=
     annotated.table.tss <- data.frame()
     annotated.tss.table.colnames <- c("seqnames", "start", "end", "width", "strand", "beta", "others", "gene.id", "tss.sur.start", "tss.sur.end", "tss.sur.width", "tx.name", "overlap.width.tss.sur", "overlap.perc.tss.sur", "tag")
 
-    hits <- GenomicRanges::findOverlaps(db.tss.ranges, table.ranges)
+    hits <- GenomicRanges::findOverlaps(db.tss.ranges, DMRs.ranges)
     tss.overlapping.ranges <- db.tss.ranges[S4Vectors::queryHits(hits), ]
-    table.tss.overlapping <- table.ranges[S4Vectors::subjectHits(hits), ]
+    table.tss.overlapping <- DMRs.ranges[S4Vectors::subjectHits(hits), ]
     table.tss.overlapping <- data.frame(table.tss.overlapping)
     table.tss.overlapping$tag <- apply(table.tss.overlapping, 1, function(x) {
         gsub(" +", "", paste0(x[1:3], collapse = "_"))
@@ -473,14 +433,13 @@ annotateDMRs = function(table , prom.length=1500, head.length=1500, longest.trx=
 
     # databases overlap and database-score
     if (nrow(results$tss.surrounding) > 0) {
-        results$tss.surrounding$dgv <- metExplorer::queryDatabase(results$tss.surrounding, dgv, return.table = FALSE)
-        results$tss.surrounding$gnomad <- metExplorer::queryDatabase(results$tss.surrounding, gnomad, return.table = FALSE)
+        results$tss.surrounding$dgv <- methyl.O::queryDatabase(results$tss.surrounding, dgv, return.table = FALSE)
+        results$tss.surrounding$gnomad <- methyl.O::queryDatabase(results$tss.surrounding, gnomad, return.table = FALSE)
         results$tss.surrounding$NCG <- NA
         results$tss.surrounding$NCG_type <- NA
         results$tss.surrounding$COSMIC <- as.numeric(results$tss.surrounding$gene.id %in% cosmic$ID)
-        results$tss.surrounding$cosmic.CGIs <- metExplorer::queryDatabase(results$tss.surrounding, cosmic.CGIs, return.table = FALSE, is.genomic.ranges = TRUE, thr = thr.cgis)
-        results$tss.surrounding$hacer <- metExplorer::queryDatabase(results$tss.surrounding, hacer, return.table = FALSE, thr = thr.enhancer)
-        results$tss.surrounding$CGIs <- metExplorer::queryDatabase(results$tss.surrounding, cgis, return.table = FALSE, thr = thr.cgis)
+        results$tss.surrounding$cosmic.CGIs <- methyl.O::queryDatabase(results$tss.surrounding, cosmic.CGIs, return.table = FALSE, is.genomic.ranges = TRUE, thr = thr.cgis)
+        results$tss.surrounding$CGIs <- methyl.O::queryDatabase(results$tss.surrounding, cgis, return.table = FALSE, thr = thr.cgis)
     }
   
 
@@ -501,9 +460,9 @@ annotateDMRs = function(table , prom.length=1500, head.length=1500, longest.trx=
     annotated.table.introns <- data.frame()
     annotated.table.introns.colnames <- c("seqnames", "start", "end", "width", "beta", "gene.id", "others", "intron.start", "intron.end", "intron.width", "intron.rank", "tx.name", "overlap.width.intron", "overlap.perc.intron", "tag")
 
-    hits <- GenomicRanges::findOverlaps(db.introns.ranked.gr, table.ranges)
-    annotated.table.ranges.overlapping <- table.ranges[S4Vectors::subjectHits(hits), ]
-    table.introns.overlapping <- data.frame(annotated.table.ranges.overlapping, stringsAsFactors = F)[, -5]
+    hits <- GenomicRanges::findOverlaps(db.introns.ranked.gr, DMRs.ranges)
+    annotated.DMRs.ranges.overlapping <- DMRs.ranges[S4Vectors::subjectHits(hits), ]
+    table.introns.overlapping <- data.frame(annotated.DMRs.ranges.overlapping, stringsAsFactors = F)[, -5]
 
     db.introns.ranges.overlapping <- db.introns.ranked.gr[S4Vectors::queryHits(hits), ]
     db.introns.overlapping <- data.frame(db.introns.ranges.overlapping, stringsAsFactors = F)
@@ -527,29 +486,17 @@ annotateDMRs = function(table , prom.length=1500, head.length=1500, longest.trx=
     annotated.table.introns$gene.id <- annotations$GENEID[match(annotated.table.introns$tx.name, annotations[,1])]
     annotated.table.introns <- annotated.table.introns[, annotated.table.introns.colnames]
 
-
-    # distances from 'intron-exon' junction
-    distances <- cbind(distance.left = annotated.table.introns["start"] - annotated.table.introns["intron.start"], distance.right = annotated.table.introns["intron.end"] - annotated.table.introns["end"])
-    intron.annotations <- cbind(annotated.table.introns, distance.left = distances[, 1], distance.right = distances[, 2])
-
-    if(nrow(intron.annotations)<0){
-        if(any(colnames(intron.annotations) %in% "others")){
-            intron.annotations <- cbind(intron.annotations[, -match("others", colnames(intron.annotations))], others = intron.annotations$others)
-        }
-    }
-
-    results$introns  <- intron.annotations
+    results$introns <- annotated.table.introns
 
     # databases overlap and database-score
     if (nrow(results$introns) > 0) {
-        results$introns$dgv <- metExplorer::queryDatabase(results$introns, dgv, return.table = FALSE)
-        results$introns$gnomad <- metExplorer::queryDatabase(results$introns, gnomad, return.table = FALSE)
+        results$introns$dgv <- methyl.O::queryDatabase(results$introns, dgv, return.table = FALSE)
+        results$introns$gnomad <- methyl.O::queryDatabase(results$introns, gnomad, return.table = FALSE)
         results$introns$NCG <- NA
         results$introns$NCG_type <- NA
         results$introns$COSMIC <- as.numeric(results$introns$gene.id %in% cosmic$ID)
-        results$introns$cosmic.CGIs <- metExplorer::queryDatabase(results$introns, cosmic.CGIs, return.table = FALSE, is.genomic.ranges = TRUE, thr = thr.cgis)
-        results$introns$hacer <- metExplorer::queryDatabase(results$introns, hacer, return.table = FALSE, thr = thr.enhancer)
-        results$introns$CGIs <- metExplorer::queryDatabase(results$introns, cgis, return.table = FALSE, thr = thr.cgis)
+        results$introns$cosmic.CGIs <- methyl.O::queryDatabase(results$introns, cosmic.CGIs, return.table = FALSE, is.genomic.ranges = TRUE, thr = thr.cgis)
+        results$introns$CGIs <- methyl.O::queryDatabase(results$introns, cgis, return.table = FALSE, thr = thr.cgis)
     }
 
 
@@ -644,6 +591,3 @@ annotateDMRs = function(table , prom.length=1500, head.length=1500, longest.trx=
     return(results)
 
 }
-
-
-
