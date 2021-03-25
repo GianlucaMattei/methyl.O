@@ -1,4 +1,4 @@
-# Methyl.O
+![](https://github.com/GianlucaMattei/methyl.O/blob/main/vignettes/logo6.png)
 ## Annotate, Score and Visualize Differentially Methylated Regions
 
 ## Introduction
@@ -9,13 +9,6 @@ During the last years the adaptation of next generation sequencing technologies 
 The R release version of methyl.O is available via Bioconductor and GitHub. 
 It can be installed as follow:
 
-Bioconductor:
-
-```R
-if (!requireNamespace("BiocManager", quietly=TRUE)) 
-install.packages("BiocManager") 
-BiocManager::install(methyl.O)
-```
 
 GitHub:
 
@@ -27,7 +20,7 @@ devtools::install_github(GianlucaMattei/methyl.O)
 Once the package is installed, using the function `runOnDesktop()` it is possible to initialize the user interface. 
 
 #### Online interface:
-methyl.O is also available online at: “INSERIRE DOMINIO”
+methyl.O is also available online at: [www.gemomica.pro](www.gemomica.pro/methyl.O)
 
 
 ## Required inputs:
@@ -67,15 +60,15 @@ Each is based on the classical gene model, which includes the promoter, the 5’
 #### **R:**	
 Genes and gene’s features can be annotated by methyl.O using the function annotateDMRs. An example dataset is included in the package and can be loaded by
 
-```DMRsSubset
+```R
 data("DMRsSubset", package="methyl.O")
 ```
 
-The function uses as default options Ensembl database to annotate and the hg19 version of human assembly. It is possible also to use hg38 for Ensembl or UCSC database and hg19 to annotate. At the moment UCSC can not be used to annotate the hg38 version of the human assembly. The settings for annotation permit to customize results. Running annotateDMRs allows: - to modify the length of promoters (prom.length, default 1500bp) and the length of the heads (head.length, default 1500bp), - to decide whether to use the longest transcript for each gene or to perform the analysis on all transcripts for each gene (longest.trx, default TRUE), - to define the database to be used for annotation (annotation, default = Ensembl), - to set the assembly version (hg, default hg19), the beta threshold for each DMRs to be considered in the annotation (thr.beta, default = 0.3), the percentage threshold for CpG Islands (CGIs) to be considered differentially methylated(thr.cgis, default = 0.4) and the percentage threshold for enhancers to be considered differentially methylated (thr.enhancer, default =0.4). Annotation.fast option concerns the method to return the gene Symbols. In fact, the ranges used as input are first annotated as Ensembl gene IDs, if Ensembl is used, or as Entrez gene IDs if UCSC is used, which in turn can be converted 1:1 to Symbols, speeding up the process, or can be 1:many (or many:1) for more accurate IDs conversion (annotation.fast, default = TRUE). The last three options permit, if the input data are not correctly formatted, to select the column number where to find the beta difference (col.betadiff, default 4), needed to perform the analysis and the columns of beta values of the two compared samples (col.beta1 and col.beta2, default = NULL), recommended but not necessary. 
+The function uses as default options Ensembl database to annotate and the hg19 version of human assembly. It is possible also to use hg38 for Ensembl or UCSC database and hg19 to annotate. At the moment UCSC can not be used to annotate the hg38 version of the human assembly. The settings for annotation permit to customize results. Running annotateDMRs allows: - to modify the length of promoters (prom.length, default 1500bp) and the length of the heads (head.length, default 1500bp), - to decide whether to use the longest transcript for each gene or to perform the analysis on all transcripts for each gene (longest.trx, default TRUE), - to define the database to be used for annotation (annotation, default = Ensembl), - to set the assembly version (hg, default hg19), the beta threshold for each DMRs to be considered in the annotation (thr.beta, default = 0.3) and the percentage threshold for CpG Islands (CGIs) to be considered differentially methylated(thr.cgis, default = 0.4). Annotation.fast option concerns the method to return the gene Symbols. In fact, the ranges used as input are first annotated as Ensembl gene IDs, if Ensembl is used, or as Entrez gene IDs if UCSC is used, which in turn can be converted 1:1 to Symbols, speeding up the process, or can be 1:many (or many:1) for more accurate IDs conversion (annotation.fast, default = TRUE). The last three options permit, if the input data are not correctly formatted, to select the column number where to find the beta difference (col.betadiff, default 4), needed to perform the analysis and the columns of beta values of the two compared samples (col.beta1 and col.beta2, default = NULL), recommended but not necessary. 
 
-```annotatedDMRs
+```R
 annotatedDMRs <- annotateDMRs(DMRsSubset , prom.length=1500, head.length=1500, longest.trx=TRUE, 
-annotation='ensembl', hg='hg19', annotation.fast=TRUE, thr.beta=.3, thr.cgis=.4, thr.enhancer=.4, 
+annotation='ensembl', hg='hg19', annotation.fast=TRUE, thr.beta=.3, thr.cgis=.4,
 col.betadiff = 4, col.beta1 = NULL, col.beta2 = NULL)
 ```
 
@@ -91,7 +84,6 @@ Compute Fast Annotation | Select the type of conversion to gene symbol from ense
 Select Promoter Lengths | Set the promoter lengths 
 Select Head Lengths | Set the head lengths 
 Length Percentage of Altered Methylated CGIs | Set the length, in percentage, of overlaps between the the DMRs and the CGIs to be considered during the analysis 
-Length Percentage of Altered Methylated Enhancers | Set the length, in percentage, of overlaps between the the DMRs and the enhancers to be considered during the analysis 
 Beta Diff. Threshold | The beta threshold for each DMRs to be considered in the annotation 
 Column Position of Beta Diff. | Select the column number where to find the beta difference 
 Column's Position of Beta Values of Sample 1 | Select the column number where to find the beta values of sample 1
@@ -127,7 +119,7 @@ methyl.O implements a customizable score system aiming to suggest the most impac
 #### **R:**	
 The function scoreAnnotatedDMRs accepts as input object the list resulting from annotateDMRs, as input options active.features which specifies the features considered to affect most the gene expression and the score.modifier,
 
-```annotatedDMRs
+```R
 annotatedDMRs <- scoreAnnotatedDMRs(annotatedDMRs, active.features = c("promoters", "heads"), score.modifier = 0.5)
 ```
 
@@ -160,7 +152,7 @@ In order to assess the effect of methylation on gene expression, enhancers canno
 #### **R:**	
 The DMRs can be annotated by the function annotateEnhancers which accepts as input the data.frame object with the genomic coordinates (chr, start and end) on the first three columns and a beta difference value on the fourth column. Other options permit to specify the genome assembly version (hg), the beta difference value threshold for filtering DMRs (thr.beta), the type of metric to filter the DMRs, the threshold value for the selected metric, the score modifier (score.modifier) which works as previously explained. The metrics to filter the DMRs can be 1) the percentage of the enhancer overlapped with the DMR, 2) the length, in bp, of the overlap between the enhancers and 3) the DMR and the length, in bp of the DMR. Finally, the column where to find the beta difference values can be set in col.betadiff option. 
 
-```annotatedEnhancers
+```R
 annotatedEnhancers <- annotateEnhancers(DMRsSubset, hg='hg19', thr.beta = 0.3, overlap.param.thr = 40, 
 param.type = "overlap.percentage", score.modifier = 0.5, col.betadiff = 4)
 ```
@@ -193,9 +185,9 @@ The package includes the option to visualize one or more DMRs occurring on one g
 
 
 #### **R:**	
-To visualize the desired gene, the function plotDMRs needs the resulting annotated list from annotateDMRs and the symbol ID of the gene. Other optional parameters permit to select the database to use between Ensembl and UCSC (database), the genome assembly version (hg), the width of the promoter (prom.width), the possibility to show all transcripts or the longest (show.all.transcripts) and to select the genomic range to show (coord.zoom). By this function it is possible to plot the beta values of samples in order to evaluate the methylation levels between two conditions. In this case this information must be included in the annotated list and in the initial input data.frame of ranges. To plot the single beta values for each sample it is necessary to indicate the name of the columns in the initial input data.frame (beta1.name, beta2.name) which can be found also under the column “other” in the annotated list object. For example by using the provided dataset you can use beta1.name=”betaTum”, beta2.name=”betaHlt”. Other graphical parameters permit: - to set the colors of the plotted beta values (beta.colors) if the beta difference value is plotted beta.colors then one color must be specified for beta.colors otherwise two must be chosen, - to set if the output plot should be in greyscale (blackandwhite), - to decide if the plotted range should be zoomed out for a better visualization (smartzoom) and other settings to save the plot including the path (path) the height and width of the output pdf (height.pdf, width.pdf).
+To visualize the desired gene, the function plotDMRs needs the resulting annotated list from annotateDMRs and the symbol ID of the gene. Other optional parameters permit to select the database to use between Ensembl and UCSC (annotation), the genome assembly version (hg), the width of the promoter (prom.width), the possibility to show all transcripts or the longest (show.all.transcripts) and to select the genomic range to show (coord.zoom). By this function it is possible to plot the beta values of samples in order to evaluate the methylation levels between two conditions. In this case this information must be included in the annotated list and in the initial input data.frame of ranges. To plot the single beta values for each sample it is necessary to indicate the name of the columns in the initial input data.frame (beta1.name, beta2.name) which can be found also under the column “other” in the annotated list object. For example by using the provided dataset you can use beta1.name=”betaTum”, beta2.name=”betaHlt”. Other graphical parameters permit: - to set the colors of the plotted beta values (beta.colors) if the beta difference value is plotted beta.colors then one color must be specified for beta.colors otherwise two must be chosen, - to set if the output plot should be in greyscale (blackandwhite), - to decide if the plotted range should be zoomed out for a better visualization (smartzoom) and other settings to save the plot including the path (path) the height and width of the output pdf (height.pdf, width.pdf).
 
-```plotDMRs
+```R
 plotDMRs(annotatedDMRs,”CTF1”)
 ```
 
@@ -223,14 +215,14 @@ In order to evaluate how methylation affects gene activity it is important to in
 ![**Figure 3**:  Correlation plot between methylation and expression. Linear regression of gene expression and hyper-methylated genes is represented by the orange dashed line. The grey dashed line represents the linear regression of gene expression with hypo-methylated genes. In this case we can observe an inverse correlation between methylation levels and expression in both cases](https://github.com/GianlucaMattei/methyl.O/blob/main/vignettes/MethylationVsExpression.png)
 
 #### **R:**	
-The function associateFeat2Exprs, needs the annotated DMRs and the normalized expression profile to perform integration of data. The function parameters permit to select the methylated features considered most affecting the expression (features), to indicate the column of the expression file where to find the gene IDs (col.genes), the statistics to use (col.stat), the log. fold change (col.logFC), the statistical (stat.thr) and the log. fold change (logfc.thr) thresholds. You can also set a threshold for the beta value (beta.thr), the metrics to filter DMRs (param.type), as explained in Annotate Methylated Enhancers paragraph, and the threshold value (overlap.param.thr). The correlation is customizable by setting the type of correlation to compute and plot (plot.type), and the method to compute the correlation coefficient (cor.type). The function accepts by default the symbol IDs but can also convert automatically other types of IDs to symbols (convert.genes). In this case it is necessary to indicate from which type of IDs they must convert the genes to symbols. The function can return a data.frame (return.table) where the beta difference and the log. fold change are associated with each gene, otherwise the function can return a plot displaying the two correlations. The customizable parameters permit to set the correlation line colors (lmfit.col1, lmfit.col2), the axis lines colors (line.col), the palette reflecting the score values for the plot (pal) and whether show the gene names next to each dot (show.text). For both data.frame and plots it is possible to filter the genes (filter.by.genes) to study how the methylation can affect for instance the gene expression of a specific pathway. 
+The function associateFeat2Exprs, needs the annotated DMRs and the normalized expression profile to perform integration of data. The function parameters permit to select the methylated features considered most affecting the expression (active.features), to indicate the column of the expression file where to find the gene IDs (col.genes), the statistics to use (col.stat), the log. fold change (col.logFC), the statistical (stat.thr) and the log. fold change (logfc.thr) thresholds. You can also set a threshold for the beta value (beta.thr), the metrics to filter DMRs (param.type), as explained in Annotate Methylated Enhancers paragraph, and the threshold value (overlap.param.thr). The correlation is customizable by setting the type of correlation to compute and plot (plot.type), and the method to compute the correlation coefficient (cor.type). The function accepts by default the symbol IDs but can also convert automatically other types of IDs to symbols (convert.genes). In this case it is necessary to indicate from which type of IDs they must convert the genes to symbols. The function can return a data.frame (return.table) where the beta difference and the log. fold change are associated with each gene, otherwise the function can return a plot displaying the two correlations. The customizable parameters permit to set the correlation line colors (lmfit.col1, lmfit.col2), the axis lines colors (line.col), the color palette (among hcl.pals()) reflecting the score values for the plot (pal) and whether show the gene names next to each dot (show.text). For both data.frame and plots it is possible to filter the genes (filter.by.genes) to study how the methylation can affect for instance the gene expression of a specific pathway. 
 
-```expressionSubset
+```R
 data(expressionSubset)
 ```
 
-```associateFeat2Exprs
-associateFeat2Exprs(annotatedDMRs, features = c("promoters", "heads"), expressionSubset, col.genes =1 , 
+```R
+associateFeat2Exprs(annotatedDMRs, expressionSubset, active.features = c("promoters", "heads"), col.genes =1 , 
 col.stat = 6, stat.thr = 0.05, col.logFC = 2, logfc.thr = 0, beta.thr = .3, plot.type = 'splitted', 
 cor.type = 'pearson', return.table = FALSE)
 ```
@@ -292,7 +284,7 @@ Select Gene IDs Annotation Type to Translate|If the above option is TRUE, then s
 Since the deregulation of one gene expression unlikely affects the final phenotype, the methylation profile effect should be evaluated as a whole in order to retrieve as small changes can cooperate to emerge in the final results. For this reason we implemented in methyl.O the possibility to perform enrichment analyses using 12 databases. Since the effects on gene expression depend on the overlapped regions, genes to query the databases can be chosen based on the annotated features. Therefore it is possible to query only the genes with DMRs overlapping their promoter, or their head, and so on, or a combination of the available features as well as all the genes returned by the annotation. Results from this analysis permit to detect the pathways where the differential methylation brings the major contributes to their perturbation. Moreover the genes from the resulting pathways can be extracted to further evaluate the correlation with methylation. 
 
 #### **R:**	
-The function annotatedDMRs2Enrichr is designed to easly perform enrichment analysis, based on the R package enrichR, using as input the annotated list object resulting from annotateDMRs. The second option permits to specify the features considered to select the genes to query the databases. Since the statistic is computed for each enriched pathway, other options define the parameters for filtering the results. Once set which statistic to use (stat.filter) between the p.value, the adj. p.value or the overlap between the queried genes and the genes of the pathway, the threshold can be defined (stat.thr). By default 12 different databases are used by default for the enrichment otherwise it is possible to select specific databases (db). The function plotDMRs2Enrichr permits to plot the results of annotatedDMRs2Enrichr. Two different types of plots can be returned: the barplot and the lollipop plot, both displaying the -log10 of p.value or adj. p.value of the enriched pathways. Therefore the smaller is the p.value the greater is the value shown in the plot. The barplot also returns additional information regarding the fraction of hyper and hypo-methylated genes among the genes that contributed to the enrichment of a specific pathway. This information can be used to better understand if a pathway is repressed, upregulated or just altered in the studied conditions. The function needs as inputs the enrichment results from annotatedDMRs2Enrichr and the annotation results from annotateDMRs. Other parameters permit to set the statistics, between the p.value, the adj. p.value or the overlap (stat), to show and sort the results, to set the number of pathways to display (n) and to set the plot type between barplot and lollipop (plot.type). The graphical parameters define the colors of the hyper and hypo-methylated genes (col.hyper; col.hypo) and the colors palette for lollipop plot. Finally it is possible to plot vertical lines indicating the statistical threshold (thrs) and set their colors (thrs.col)
+The function annotatedDMRs2Enrichr is designed to easly perform enrichment analysis, based on the R package enrichR, using as input the annotated list object resulting from annotateDMRs. The second option permits to specify the features considered to select the genes to query the databases. Since the statistic is computed for each enriched pathway, other options define the parameters for filtering the results. Once set which statistic to use (stat.filter) between the p.value, the adj. p.value or the overlap between the queried genes and the genes of the pathway, the threshold can be defined (stat.thr). By default 12 different databases are used by default for the enrichment otherwise it is possible to select specific databases (db). The function plotDMRs2Enrichr permits to plot the results of annotatedDMRs2Enrichr. Two different types of plots can be returned: the barplot and the lollipop plot, both displaying the -log10 of p.value or adj. p.value of the enriched pathways. Therefore the smaller is the p.value the greater is the value shown in the plot. The barplot also returns additional information regarding the fraction of hyper and hypo-methylated genes among the genes that contributed to the enrichment of a specific pathway. This information can be used to better understand if a pathway is repressed, upregulated or just altered in the studied conditions. The function needs as inputs the enrichment results from annotatedDMRs2Enrichr and the annotation results from annotateDMRs. Other parameters permit to set the statistics, between the p.value, the adj. p.value or the overlap (stat), to show and sort the results, to set the number of pathways to display (n) and to set the plot type between barplot and lollipop (plot.type). The graphical parameters define the colors of the hyper and hypo-methylated genes (col.hyper; col.hypo) and the colors palette (among among hcl.pals()) for lollipop plot. Finally it is possible to plot vertical lines indicating the statistical threshold (thrs) and set their colors (thrs.col)
 
 
 #### **GUI:**	
@@ -323,21 +315,21 @@ While alteration of methylation on genes alone can lead to little changes, a DMR
 #### **R:**	
 First it is necessary to annotate the TFs to the target genes. This can be done by the function associateTFs2Exprs which accepts as input the annotated DMRs and the expression profile. The specific parameters for input methylation and for expression profiles are the same as used in other functions which integrate expression and methylation data. 
 
-```TFs2Targets
-TFs2Targets <- associateTFs2Exprs(annotatedDMRs, features = c("promoters", "heads"), expressionSubset, col.genes = 1,  
+```R
+TFs2Targets <- associateTFs2Exprs(annotatedDMRs, expressionSubset, active.features = c("promoters", "heads") col.genes = 1,  
 col.stat = 6, stat.thr = 0.05, col.logFC = 2, logfc.thr = 0, beta.thr = .3, 
 overlap.param.thr = 30, param.type = 'overlap.percentage')
 ```
 
 Once the association between TFs and targets is retrieved, it is possible to plot the beta difference of a methylation occurring on a specific TF and the expression levels of target genes, as shown in figure 7, using the function plotTFs2Exprs. It needs as input the output of the function associateTFs2Exprs and the TF symbol to plot. The graphical parameters allow to choose the color of the methylation bar and the color palette of the expression values. 
 
-```plotTFs2Exprs
+```R
 plotTFs2Exprs(TFs2Targets, symbol, col.meth = '##8e0000', pals.bars = 'Cold')
 ```
 
 The results from the function associateTFs2Exprs can also be used to assess if the methylation of few TFs can affect any pathway by querying enrichR with the target genes. This can be easily done using the function tfs2Enrichr
 
-```tfs2Enrichr
+```R
 tfs2Enrichr(TFs2Targets, logfc.thr = 1, stat.filter = 'P.value', stat.thr = 0.01)
 ```
 
