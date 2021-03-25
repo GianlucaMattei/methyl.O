@@ -91,7 +91,7 @@ Column Position of Beta Diff. | Select the column number where to find the beta 
 Column's Position of Beta Values of Sample 1 | Select the column number where to find the beta values of sample 1
 Column's Position of Beta Values of Sample 2 | Select the column number where to find the beta values of sample 1
 
-**Table 2**: Parameters for Annotate Methylated Regions tab
+##### **Table 2**: Parameters for Annotate Methylated Regions tab
 
 
 In the GUI we also implemented some plots to have a quick overview on results. These plots are in order: the beta difference values distribution by chromosome, the number distribution of DMRs by chromosome, the distribution of widths, ranks, beta values and database scores, for each annotation (Genes, Heads, TSS surrounding, Promoters, Exons, 5’UTRs, 3’UTRs, Introns). Two additional annotations can be plotted (First exons, First introns). The last plot compares the number of DMRs for each annotated region. Each of these plots has some specific customization settings by clicking on the red gear button. Other common settings are placed in the left column of the page:
@@ -107,7 +107,7 @@ Selected Feature Percentage Max | Maximum methylation width threshold in %
 Feature Rank Min | Minimum rank threshold 
 Feature Rank Max | Maximum rank threshold
 
-**Table 3:** Additional parameters for plots and for results table in Annotate Methylated Regions tab
+##### **Table 3:** Additional parameters for plots and for results table in Annotate Methylated Regions tab
 
 </p>
 
@@ -142,7 +142,7 @@ chr16|3067875|3068113|239|0.3508772|3066946|3072087|5142|+|ENSG00000006327|ENST0
 chr1|55266381|55266722|342|0.3076923|55245385|55268440|23056|-|ENSG00000006555|ENST00000371276|1.4833449|chr1_55266381_55266722|1|1|0|0|0|0|1|1|TTC22|3|betaHlt=0.0588235294117647;betaTum=0.533333333333333;pval=0.00369137539839573
 chr19|42056859|42057411|553|-0.4423077|42054386|42093196|38811|+|ENSG00000007129|ENST00000407170|1.4248538|chr19_42056859_42057411|1|1|0|0|0|0|0|1|CEACAM21|3|betaHlt=0.777777777777778;betaTum=0.25;pval=0.0080063295572896
 
-**Table 4:** Resulting annotation for genes
+##### **Table 4:** Resulting annotation for genes
 
 The first five columns (seqnames, start, end, width and beta) refer to the annotated DMRs, symbol refers to the overlapping gene, score is the ranking score assigned to the DMRs and is specific for genes only, others contains all the additional information found in the input table, gene start, gene end, gene width and gene strand are coordinates and characteristics regarding the overlapped gene. For other elements these characteristics will be specific for the selected feature For example for introns we will have intron start, intron end, intron width and intron strand. The second part of the table contains the gene id and transcript name according to the database used for annotations, genes perc is the percentage of the gene (or the current feature selected) overlapped by the DMR, tag is an ID referred to the DMR, dgv, gnomad, NCG, NCG type, COSMIC, hacer, CGIs and TF are the information retrieved from database querying, where 1 is used when the DMR’s range is present in the database, and finally database score is the computed score for database as described in the paper. According to the selected element/feature, additional columns are shown: these are one returning the overlap in bp between the DMR and the feature, and rank which returns the position of the annotated element in the gene model. Moreover the GUI permits to sort the displaying table by clicking the desidered column and to search words, as the gene ids or transcript ids, within the table.
 
@@ -170,7 +170,7 @@ Beta Diff. Threshold | The beta threshold for each DMRs to be considered in the 
 Score Modifier | Ranging from 0 to 1, where 0 returns a score based only on the databases and 1 on the characteristics of overlaps.
 Column Position of Beta Diff. | Select the column number where to find the beta difference
 
-**Table 5:** Parameters of Annotate Methylated Enhancers tab
+##### **Table 5:** Parameters of Annotate Methylated Enhancers tab
 
 Additional plots in the GUI are returned: one for the selected parameter distribution and one for the beta difference values distribution. Both are customizable by the red gear button above the plots.
 
@@ -213,7 +213,7 @@ Smart Zoom|Zoom out the range for a better visualization
 Promoters Length|Sets the promoter length
 Zoom Coordinate - From / to |Sets custom coordinates for the range to display
 
-**Table 6:** Parameters for Visualize Methylation tab 
+##### **Table 6:** Parameters for Visualize Methylation tab 
 
 
 ## Expression Data Integration:
@@ -263,7 +263,7 @@ Set the column position in the expression file where to find the statistics (p.v
 Set the column position in the expression file where to get the log. fold changes values. | Select TRUE if Gene IDs are not Symbols
 If selected, gene IDs are not official symbols| Select Gene IDs Annotation Type to Translate | If the above option is TRUE, then select the type of IDs provided.
 
-**Table 7:** Parameters for Methylation vs Expression tab
+##### **Table 7:** Parameters for Methylation vs Expression tab
 
 Other settings to customize the plot can be found in the red gear button above the plot. Here can be also found the option to compute splitted correlation for hyper-methylated and hypo-methylated genes.
 
@@ -293,7 +293,7 @@ Column position of logFC|Set the column position in the expression file where to
 Select TRUE if Gene IDs are not Symbols |If selected, gene IDs are not official symbols
 Select Gene IDs Annotation Type to Translate|If the above option is TRUE, then select the type of IDs provided.
 
-**Table 8**: Parameters for Methylated Enhancers vs Expression tab
+##### **Table 8**: Parameters for Methylated Enhancers vs Expression tab
 
 
 ## Enrichment of Methylated Regions:
@@ -315,7 +315,7 @@ DBs to Query | Select the database to query among the 12 available. If left blan
 LogFC Threshold | The log. fold change threshold for genes to be considered.
 Value Threshold for Filtering by Statistics | Select the statistical threshold for the selected statistics. 
 
-**Table 9:** Parameters for Methylation Enrichment tab
+##### **Table 9:** Parameters for Methylation Enrichment tab
 
 Finally, since the enrichment is performed on results by the annotation process, changing the parameters used for annotation itself will affect the resulting enriched pathways.
 
