@@ -183,7 +183,9 @@ The package includes the option to visualize one or more DMRs occurring on one g
 
 <p align="center">
 
-<img src="https://github.com/GianlucaMattei/methyl.O/blob/main/vignettes/visualizeMethylation.png" alt=" Figure2: Starting from the top of the plot are shown: the chromosome location, the CGIs ranges, the promoter range and its direction, one or more transcripts associated with the gene and the information about the DMR including the beta difference value and length. " >
+<img src="https://github.com/GianlucaMattei/methyl.O/blob/main/vignettes/visualizeMethylation.png" alt=" " >
+
+**Figure2**: Starting from the top of the plot are shown: the chromosome location, the CGIs ranges, the promoter range and its direction, one or more transcripts associated with the gene and the information about the DMR including the beta difference value and length.
 
 </p>
 
@@ -220,7 +222,9 @@ In order to evaluate how methylation affects gene activity it is important to in
 
 <p align="center">
 
-<img src="https://github.com/GianlucaMattei/methyl.O/blob/main/vignettes/MethylationVsExpression.png" alt=" **Figure 3**:  Correlation plot between methylation and expression. Linear regression of gene expression and hyper-methylated genes is represented by the orange dashed line. The grey dashed line represents the linear regression of gene expression with hypo-methylated genes. In this case we can observe an inverse correlation between methylation levels and expression in both cases " >
+<img src="https://github.com/GianlucaMattei/methyl.O/blob/main/vignettes/MethylationVsExpression.png" alt="" >
+
+ **Figure 3**:  Correlation plot between methylation and expression. Linear regression of gene expression and hyper-methylated genes is represented by the orange dashed line. The grey dashed line represents the linear regression of gene expression with hypo-methylated genes. In this case we can observe an inverse correlation between methylation levels and expression in both cases 
 
 </p>
 
@@ -324,7 +328,9 @@ While alteration of methylation on genes alone can lead to little changes, a DMR
 
 <p align="center">
 
-<img src="https://github.com/GianlucaMattei/methyl.O/blob/main/vignettes/EnrichrTFsPlot.png" alt=" **Figure 4**: The plot shows on the left the beta Difference of Methylation between two compared conditions of specific TFs, STAT1 in this case, and the expression of target genes. " >
+<img src="https://github.com/GianlucaMattei/methyl.O/blob/main/vignettes/EnrichrTFsPlot.png" alt=" " >
+
+**Figure 4**: The plot shows on the left the beta Difference of Methylation between two compared conditions of specific TFs, STAT1 in this case, and the expression of target genes. 
 
 </p>
  
