@@ -476,7 +476,7 @@ runOnDesktop <- function(){
 
 
         output$logo <- shiny::renderImage({
-            logo <- paste0(.libPaths()[1], "/methyl.O/data/logo5.png")
+            logo <- paste0(.libPaths()[1], "/methyl.O/data/logo6.png")
             list(src = logo,
                 width =" 20%",
                 contentType = 'image/png',
