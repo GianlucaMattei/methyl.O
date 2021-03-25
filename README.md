@@ -52,7 +52,9 @@ Each is based on the classical gene model, which includes the promoter, the 5’
 
 <p align="center">
 
-<img src="https://github.com/GianlucaMattei/methyl.O/blob/main/vignettes/genemodels.png" alt=" **Figure 1**: Schematic gene model " width="45%" height="45%">
+<img src="https://github.com/GianlucaMattei/methyl.O/blob/main/vignettes/genemodels.png" alt="" width="45%" height="45%">
+
+**Figure 1**: Schematic gene model
 
 </p>
 
@@ -181,7 +183,7 @@ The package includes the option to visualize one or more DMRs occurring on one g
 
 <p align="center">
 
-<img src="https://github.com/GianlucaMattei/methyl.O/blob/main/vignettes/visualizeMethylation.png" alt=" **Figure2**: Starting from the top of the plot are shown: the chromosome location, the CGIs ranges, the promoter range and its direction, one or more transcripts associated with the gene and the information about the DMR including the beta difference value and length. " >
+<img src="https://github.com/GianlucaMattei/methyl.O/blob/main/vignettes/visualizeMethylation.png" alt=" Figure2: Starting from the top of the plot are shown: the chromosome location, the CGIs ranges, the promoter range and its direction, one or more transcripts associated with the gene and the information about the DMR including the beta difference value and length. " >
 
 </p>
 
