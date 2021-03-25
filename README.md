@@ -54,7 +54,7 @@ Each is based on the classical gene model, which includes the promoter, the 5’
 
 <img src="https://github.com/GianlucaMattei/methyl.O/blob/main/vignettes/genemodels.png" alt="" width="45%" height="45%">
 
-**Figure 1**: Schematic gene model
+##### **Figure 1**: Schematic gene model
 
 </p>
 
@@ -185,7 +185,7 @@ The package includes the option to visualize one or more DMRs occurring on one g
 
 <img src="https://github.com/GianlucaMattei/methyl.O/blob/main/vignettes/visualizeMethylation.png" alt=" " >
 
-**Figure2**: Starting from the top of the plot are shown: the chromosome location, the CGIs ranges, the promoter range and its direction, one or more transcripts associated with the gene and the information about the DMR including the beta difference value and length.
+##### **Figure2**: Starting from the top of the plot are shown: the chromosome location, the CGIs ranges, the promoter range and its direction, one or more transcripts associated with the gene and the information about the DMR including the beta difference value and length.
 
 </p>
 
@@ -224,7 +224,7 @@ In order to evaluate how methylation affects gene activity it is important to in
 
 <img src="https://github.com/GianlucaMattei/methyl.O/blob/main/vignettes/MethylationVsExpression.png" alt="" >
 
- **Figure 3**:  Correlation plot between methylation and expression. Linear regression of gene expression and hyper-methylated genes is represented by the orange dashed line. The grey dashed line represents the linear regression of gene expression with hypo-methylated genes. In this case we can observe an inverse correlation between methylation levels and expression in both cases 
+##### **Figure 3**:  Correlation plot between methylation and expression. Linear regression of gene expression and hyper-methylated genes is represented by the orange dashed line. The grey dashed line represents the linear regression of gene expression with hypo-methylated genes. In this case we can observe an inverse correlation between methylation levels and expression in both cases 
 
 </p>
 
@@ -293,7 +293,7 @@ Column position of logFC|Set the column position in the expression file where to
 Select TRUE if Gene IDs are not Symbols |If selected, gene IDs are not official symbols
 Select Gene IDs Annotation Type to Translate|If the above option is TRUE, then select the type of IDs provided.
 
-**Table 7**: Parameters for Methylated Enhancers vs Expression tab
+**Table 8**: Parameters for Methylated Enhancers vs Expression tab
 
 
 ## Enrichment of Methylated Regions:
@@ -315,7 +315,7 @@ DBs to Query | Select the database to query among the 12 available. If left blan
 LogFC Threshold | The log. fold change threshold for genes to be considered.
 Value Threshold for Filtering by Statistics | Select the statistical threshold for the selected statistics. 
 
-**Table 8:** Parameters for Methylation Enrichment tab
+**Table 9:** Parameters for Methylation Enrichment tab
 
 Finally, since the enrichment is performed on results by the annotation process, changing the parameters used for annotation itself will affect the resulting enriched pathways.
 
@@ -330,7 +330,7 @@ While alteration of methylation on genes alone can lead to little changes, a DMR
 
 <img src="https://github.com/GianlucaMattei/methyl.O/blob/main/vignettes/EnrichrTFsPlot.png" alt=" " >
 
-**Figure 4**: The plot shows on the left the beta Difference of Methylation between two compared conditions of specific TFs, STAT1 in this case, and the expression of target genes. 
+##### **Figure 4**: The plot shows on the left the beta Difference of Methylation between two compared conditions of specific TFs, STAT1 in this case, and the expression of target genes. 
 
 </p>
  
