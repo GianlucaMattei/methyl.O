@@ -479,8 +479,7 @@ runOnDesktop <- function(){
             logo <- paste0(.libPaths()[1], "/methyl.O/data/logo6.png")
             list(src = logo,
                 width =" 20%",
-                contentType = 'image/png',
-                alt = "This is alternate text"
+                contentType = 'image/png'
             )
         }, deleteFile = F)
 
@@ -501,7 +500,7 @@ runOnDesktop <- function(){
 
 
 
-        checkDefault <- paste0(1500, 1500, "TRUE", "ensembl", "hg19", "TRUE", 0.3, 0.3, 0.4, 4)
+        checkDefault <- paste0(1500, 1500, "TRUE", "ensembl", "hg19", "TRUE", 0.3, 0.3, 4)
         checkCurent <- shiny::reactive({
             paste0(input$promLength,input$headLength, input$longestTrxs, input$annotation, input$hg, input$annotationFast, input$thrBeta, input$thrCGIs, input$colBetaDiff)
         })
@@ -565,7 +564,7 @@ runOnDesktop <- function(){
 
         output$resultsTab <- DT::renderDataTable({
             if (input$choosenFeature == "genes") {
-                DT::datatable(resultsTab()[order(resultsTab()$score, decreasing = T), c(1:5, 23, 26, 25, 6:22,24)], rownames = FALSE, options = list(
+                DT::datatable(resultsTab()[order(resultsTab()$score, decreasing = T), c(1:5, 21, 25, 6:20,22:24)], rownames = FALSE, options = list(
                     autoWidth = TRUE, scrollX = TRUE
                 ))
             } else {
@@ -947,7 +946,7 @@ runOnDesktop <- function(){
 
             metExpressionPlot <- shiny::reactive ({
                 annotatedDMRs2Exprs(
-                    results = resultsScore(), active.features = input$featureMetExpr,
+                    annotatedDMRs = resultsScore(), active.features = input$featureMetExpr,
                     expressionProfile = expressionProfile(), col.genes = input$expressionColSymbol,
                     col.stat = input$expressionColStat, stat.thr = input$expressionStatThr, col.logFC = input$expressionColLogFC, logfc.thr = input$expressionLFCthr, convert.genes = input$convertGeneExpression, convert.from = input$convertGeneExpressionFrom, beta.thr = input$metExprBetaThr,
                     overlap.param.thr = input$overlapParamThr, param.type = input$paramType, line.col = input$colrsMetExpression, lmfit.col1 = input$lmfitCol1, lmfit.col2 = input$lmfitCol2, pal = input$metExpressionPal,
@@ -962,7 +961,7 @@ runOnDesktop <- function(){
 
             output$metExpressionTable <- DT::renderDataTable({
                 methyl.O::annotatedDMRs2Exprs(
-                    results = resultsScore(), active.features = input$featureMetExpr, expressionProfile = expressionProfile(),
+                    annotatedDMRs = resultsScore(), active.features = input$featureMetExpr, expressionProfile = expressionProfile(),
                     col.genes = input$expressionColSymbol,
                     input$expressionColStat, input$expressionStatThr, input$expressionColLogFC, input$expressionLFCthr, input$convertGeneExpression, input$convertGeneExpressionFrom, input$metExprBetaThr,
                     input$overlapParamThr, param.type = input$paramType, input$colrsMetExpression, input$lmfitCol1, input$lmfitCol2, input$metExpressionPal,
@@ -1011,10 +1010,10 @@ runOnDesktop <- function(){
 
         enhExpressionPlot <- shiny::eventReactive(input$correlateEnh, { 
             methyl.O::annotatedEnh2Exprs(
-                enhancerAnn(), expressionProfile(), input$hg,
+                annotatedEnhancers = enhancerAnn(), expressionProfile = expressionProfile(), hg = input$hg,
                 enhancer.db = input$enhancerDB, col.genes = input$expressionColSymbol, col.stat = input$expressionColStat,
-                stat.thr = input$expressionStatThr, col.logFC = input$expressionColLogFC, logfc.thr = input$expressionLFCthr, convert.genes = input$convertGeneExpression, input$convertGeneExpressionFrom, beta.thr = input$enhExprBetaThr,
-                overlap.param.thr = input$overlapParamThrEnh, param.type = input$paramTypeEnh ,line.col = input$colrsEnhExpression, lmfit.col1 = input$lmfitCol1Enh, lmfit.col2 = input$lmfitCol2Enh, 
+                stat.thr = input$expressionStatThr, col.logFC = input$expressionColLogFC, logfc.thr = input$expressionLFCthr, convert.genes = input$convertGeneExpression, convert.from = input$convertGeneExpressionFrom, beta.thr = input$enhExprBetaThr,
+                overlap.param.thr = input$overlapParamThrEnh, param.type = input$paramTypeEnh, line.col = input$colrsEnhExpression, lmfit.col1 = input$lmfitCol1Enh, lmfit.col2 = input$lmfitCol2Enh, 
                 pal = input$enhExpressionPal, plot.type = input$enhExpressionPlotType, show.text = input$showTextEnh, cor.type = input$enhExpressionCorType, return.table = FALSE
             )
         })
@@ -1032,7 +1031,7 @@ runOnDesktop <- function(){
             content <- function(file) {
                 pdf(file, width = 13)
                 methyl.O::annotatedEnh2Exprs(
-                    enhancerAnn(), expressionProfile(), input$hg,
+                    annotatedEnhancers = enhancerAnn(), expressionProfile = expressionProfile(), hg = input$hg,
                     enhancer.db = input$enhancerDB, col.genes = input$expressionColSymbol, col.stat = input$expressionColStat,
                     stat.thr = input$expressionStatThr, col.logFC = input$expressionColLogFC, logfc.thr = input$expressionLFCthr, convert.genes = input$convertGeneExpression, input$convertGeneExpressionFrom, beta.thr = input$enhExprBetaThr,
                     overlap.param.thr = input$overlapParamThrEnh, param.type = input$paramTypeEnh,  line.col = input$colrsEnhExpression, lmfit.col1 = input$lmfitCol1Enh, lmfit.col2 = input$lmfitCol2Enh, 
@@ -1046,7 +1045,7 @@ runOnDesktop <- function(){
 
         enhExpressionTable <- shiny::eventReactive(input$correlateEnh, {
             methyl.O::annotatedEnh2Exprs(
-                enhancerAnn(), expressionProfile(), input$hg,
+                annotatedEnhancers = enhancerAnn(), expressionProfile = expressionProfile(), hg = input$hg,
                 enhancer.db = input$enhancerDB, col.genes = input$expressionColSymbol, col.stat = input$expressionColStat,
                 stat.thr = input$expressionStatThr, col.logFC = input$expressionColLogFC, logfc.thr = input$expressionLFCthr, convert.genes = input$convertGeneExpression, input$convertGeneExpressionFrom, beta.thr = input$enhExprBetaThr,
                 overlap.param.thr = input$overlapParamThrEnh, param.type = input$paramTypeEnh, line.col = input$colrsEnhExpression, lmfit.col1 = input$lmfitCol1Enh, lmfit.col2 = input$lmfitCol2Enh, 

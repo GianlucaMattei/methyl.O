@@ -54,7 +54,7 @@ annotateEnhancers <- function(DMRsRanges, hg='hg19', thr.beta = 0.3,  overlap.pa
     })
     # FANTOM5 - NCG
     ncg.hits <- lapply(genes.query.list, function(x) {
-        x.names <- x[[1]][which(x[[1]] %in% ncg$symbol)]
+        x.names <- x[which(x %in% ncg$symbol)]
         x.hits <- length(x.names[!is.na(x.names)])
         if (x.hits == 0) {
             x.names <- NA
@@ -72,7 +72,7 @@ annotateEnhancers <- function(DMRsRanges, hg='hg19', thr.beta = 0.3,  overlap.pa
 
     # FANTOM5 - COSMIC
     cosmic.hits <- lapply(genes.query.list, function(x) {
-        x.names <- x[[1]][which(x[[1]] %in% cosmic$symbol)]
+        x.names <- x[which(x %in% cosmic$symbol)]
         x.hits <- length(x.names[!is.na(x.names)])
         if (x.hits == 0) {
             x.names <- NA
@@ -95,7 +95,7 @@ annotateEnhancers <- function(DMRsRanges, hg='hg19', thr.beta = 0.3,  overlap.pa
     })
     # GENOME4D - NCG
     ncg.hits <- lapply(genes.query.list, function(x) {
-        x.names <- x[[1]][which(x[[1]] %in% ncg$symbol)]
+        x.names <- x[which(x %in% ncg$symbol)]
         x.hits <- length(x.names[!is.na(x.names)])
         if (x.hits == 0) {
             x.names <- NA
@@ -113,7 +113,7 @@ annotateEnhancers <- function(DMRsRanges, hg='hg19', thr.beta = 0.3,  overlap.pa
 
     # FANTOM5 - COSMIC
     cosmic.hits <- lapply(genes.query.list, function(x) {
-        x.names <- x[[1]][which(x[[1]] %in% cosmic$symbol)]
+        x.names <- x[which(x %in% cosmic$symbol)]
         x.hits <- length(x.names[!is.na(x.names)])
         if (x.hits == 0) {
             x.names <- NA

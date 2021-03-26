@@ -22,7 +22,7 @@ plotMethylationOverview <- function(annotatedDMRs, plot.type, palette) {
         palette <- hcl.colors(length(unique(plot.df$chr)), palette = palette)
     }
 
-    if (opt == "boxplot") {
+    if (plot.type == "boxplot") {
         ggplot2::ggplot(plot.df, ggplot2::aes(x = chr, y = Beta)) +
             ggplot2::geom_boxplot(position = "identity", fill=palette) +
             ggplot2::theme_bw() +
@@ -36,7 +36,7 @@ plotMethylationOverview <- function(annotatedDMRs, plot.type, palette) {
                 axis.text.x = ggplot2::element_text(angle = 90)
             ) +
             ggplot2::ylim(-1, 1) + ggplot2::ggtitle("Beta diff. values distribution by chromosome")
-    } else if (opt == "violin") {
+    } else if (plot.type == "violin") {
         ggplot2::ggplot(plot.df, ggplot2::aes(x = chr, y = Beta)) +
             ggplot2::geom_violin(ggplot2::aes(fill = chr)) +
             ggplot2::scale_fill_manual(values = palette) +
