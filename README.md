@@ -20,7 +20,7 @@ devtools::install_github("GianlucaMattei/methyl.O")
 Once the package is installed, using the function `runOnDesktop()` it is possible to initialize the user interface. 
 
 #### Online interface:
-methyl.O is also available online at: [www.gemomica.pro](www.gemomica.pro/methyl.O)
+methyl.O is also available online at: www.genomica.pro
 
 
 ## Required inputs:
