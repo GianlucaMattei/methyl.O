@@ -5,7 +5,7 @@ Methyl.O is a R package including several utilities for smart approaches to stud
 
 Link to methyl.O repo: [link] www.github.com/GianlucaMattei/methyl.O
 
-Link to the browser version of methyl.O: www.genomica.pro
+Link to the browser version of methyl.O: [link] www.genomica.pro
 
 
 
