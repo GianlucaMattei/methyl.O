@@ -41,7 +41,7 @@ runOnDesktop <- function(){
                     shiny::hr(style = "border-top: 1px solid #000000;"),
 
                     shiny::tags$footer(
-                        HTML(
+                        shiny::HTML(
                             "<!-- Footer -->
                             <footer class='page-footer font-large indigo'>
                             <div class='footer-copyright text-center py-3'>
