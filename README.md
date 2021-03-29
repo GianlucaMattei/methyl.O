@@ -2,12 +2,12 @@
               _**Annotate, Score and Visualize Differentially Methylated Regions**_
 
 
-## Documentation and contacts
+## Documentation and Contacts
 [**Documentation**](https://github.com/GianlucaMattei/methyl.O/wiki)
 
 [**gianluca.mattei@unifi.it**](mailto:gianluca.mattei@unifi.it?subject=[GitHub]%20Source%20Han%20Sans)
 
-[ **reserve a 30 mins meeting** ](https://calendly.com/gianluca-mattei/30min)
+[ **Reserve 30 min meeting** ](https://calendly.com/gianluca-mattei/30min)
 
 
 
