@@ -23,7 +23,7 @@ It can be installed as follow:
 GitHub:
 
 ```R
-devtools::install_github("GianlucaMattei/methyl.O")
+devtools::install_github("GianlucaMattei/methyl.O", dependencies = TRUE) 
 ```
 
 #### Run interface:
