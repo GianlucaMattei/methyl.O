@@ -9,7 +9,13 @@ runOnDesktop <- function(){
 
     # uiOutput("colBeta")
     ui <- shiny::fluidPage(
-        # shinythemes::themeSelector(),
+
+
+        tags$head( tags$meta(charset="UTF-8"), 
+            shiny::tags$meta(name="description", content="Methyl.O is a R package including several utilities for smart approaches, including the integration of expression data, to study the impact of differentially methylated segments of DNA between two conditions. Link to methyl.O repo: www.github.com/GianlucaMattei/methyl.O Link to the browser version of methyl.O: www.genomica.pro"), 
+            shiny::tags$meta(name="keywords", content="methyl.o, methylo, DMRs, differentially methylated, expression integration, methylation analysis")        
+        ),
+
         theme = shinythemes::shinytheme("simplex"),
         shiny::navbarPage(
             "methyl.O",
@@ -18,7 +24,9 @@ runOnDesktop <- function(){
                 shiny::mainPanel(
                     align = "center", width = 8,
                     shiny::imageOutput("logo", height = 66),
-                    shiny::h5("Start to navigate to use a toy dataset or upload your data", style = "color:grey"),
+                    shiny::hr(style = "border-top: 0px solid #000000;"),
+                    shiny::hr(style = "border-top: 0px solid #000000;"),
+                    shiny::h5("Start to navigate to use a example dataset or upload your data", style = "color:grey"),
                     shiny::hr(style = "border-top: 0px solid white;"),
                     shiny::fluidPage(
                         shiny::fileInput(inputId = "bedfile", label = "Upload your file here", placeholder = "select a file", multiple = FALSE),
@@ -29,7 +37,20 @@ runOnDesktop <- function(){
                         ),
                         shiny::tags$style(".btn-file {background-color: red; border-color: red;}"),
                         shiny::hr(style = "border-top: 0px solid #000000;")
-                    )
+                    ),
+                    shiny::hr(style = "border-top: 1px solid #000000;"),
+
+                    shiny::tags$footer(
+                        HTML(
+                            "<!-- Footer -->
+                            <footer class='page-footer font-large indigo'>
+                            <div class='footer-copyright text-center py-3'>
+                            Methyl.O is a R package including several utilities for smart approaches, including the integration of expression data, to study the impact of differentially methylated segments of DNA between two conditions. Link to methyl.O repo: <a href='www.github.com/GianlucaMattei/methyl.O'> GianlucaMattei/methyl.O</a> Link to the browser version of methyl.O: <a href='www.genomica.pro'> www.genomica.pro</a>
+                            </div>
+                            </footer>
+                            <!-- Footer -->"
+                        )
+                    ),
                 )
             ),
 
