@@ -35,7 +35,7 @@ https://github.com/GianlucaMattei/methyl.O/releases/download/1.0/methyl.O.tar.gz
 ```bash
 https://github.com/GianlucaMattei/methyl.O/releases/download/1.0/methyl.O.tar.gz
 ```
-then install in R:
+then install the package from local directory in R:
 
 ```r
 install.packages("path/to/tar.gz", repos=NULL)
