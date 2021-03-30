@@ -6,14 +6,11 @@
 
 runOnDesktop <- function(){
     options(spinner.color = "#0275D8", spinner.color.background = "#ffffff", spinner.size = 2)
-    theme = shinythemes::shinytheme("simplex"),
     ui <- shiny::fluidPage(
-        shiny::tags$head(shiny::tags$meta(charset="UTF-8"), 
-            shiny::tags$meta(name="description", content="Methyl.O is a R package including several utilities for smart approaches, including the integration of expression data, to study the impact of differentially methylated segments of DNA between two conditions. Link to methyl.O repo: www.github.com/GianlucaMattei/methyl.O Link to the browser version of methyl.O: www.genomica.pro"), 
-            shiny::tags$meta(name="keywords", content="methyl.o, methylo, DMRs, differentially methylated, expression integration, methylation analysis")        
-        ),
-
-        theme <- shinythemes::shinytheme("simplex"),
+        shiny::tags$head(shiny::tags$meta(charset="UTF-8")), 
+        shiny::tags$meta(name="description", content="Methyl.O is a R package including several utilities for smart approaches, including the integration of expression data, to study the impact of differentially methylated segments of DNA between two conditions. Link to methyl.O repo: www.github.com/GianlucaMattei/methyl.O Link to the browser version of methyl.O: www.genomica.pro"), 
+        shiny::tags$meta(name="keywords", content="methyl.o, methylo, DMRs, differentially methylated, expression integration, methylation analysis"),
+        theme = shinythemes::shinytheme("simplex"),
         shiny::navbarPage(
             "methyl.O",
             shiny::tabPanel("Homepage",
@@ -43,6 +40,7 @@ runOnDesktop <- function(){
                             <footer class='page-footer font-large indigo'>
                             <div class='footer-copyright text-center py-3'>
                             Methyl.O is a R package including several utilities for smart approaches, including the integration of expression data, to study the impact of differentially methylated segments of DNA between two conditions. Link to methyl.O repo: <a href='www.github.com/GianlucaMattei/methyl.O'> GianlucaMattei/methyl.O</a> Link to the browser version of methyl.O: <a href='www.genomica.pro'> www.genomica.pro</a>
+                            Support: gianluca.mattei@unifi.it
                             </div>
                             </footer>
                             <!-- Footer -->"
@@ -473,15 +471,14 @@ runOnDesktop <- function(){
                         shiny::selectInput("enrThrPlotColTF", "Colors for Statistics Thresholds to Plot", choices = c("red", "yellow", "green", "orange", "magenta", "brown", "black", "grey", "grey20", "grey70"), multiple =TRUE, selected = c("green","orange")),
                         circle = TRUE, status = "primary", icon = shiny::icon("cogs"), size = "sm"
                     ),
+                    
                     shinycssloaders::withSpinner(shiny::plotOutput(outputId = "enrPlotTF", height = "500px"), type = 1),
                     shiny::hr(style = "border-top: 0px solid white;"),
                     shiny::downloadButton("downloadEnrichrPlotTf", "Download Table"),
                     shiny::hr(),
-
                 )
             )
         )
-
     )
 
 
