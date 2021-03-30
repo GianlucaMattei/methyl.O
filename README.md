@@ -1,6 +1,6 @@
 ![](https://github.com/GianlucaMattei/methyl.O/blob/main/vignettes/logo6.png)
               _**Annotate, Score and Visualize Differentially Methylated Regions**_
-
+ 
 
 ## Documentation and Contacts
 [**Documentation**](https://github.com/GianlucaMattei/methyl.O/wiki)
