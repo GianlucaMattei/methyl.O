@@ -6,8 +6,7 @@
 
 runOnDesktop <- function(){
     options(spinner.color = "#0275D8", spinner.color.background = "#ffffff", spinner.size = 2)
-
-    # uiOutput("colBeta")
+    theme = shinythemes::shinytheme("simplex"),
     ui <- shiny::fluidPage(
         shiny::tags$head(shiny::tags$meta(charset="UTF-8"), 
             shiny::tags$meta(name="description", content="Methyl.O is a R package including several utilities for smart approaches, including the integration of expression data, to study the impact of differentially methylated segments of DNA between two conditions. Link to methyl.O repo: www.github.com/GianlucaMattei/methyl.O Link to the browser version of methyl.O: www.genomica.pro"), 
