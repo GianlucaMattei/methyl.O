@@ -7,7 +7,7 @@
 
 [**gianluca.mattei@unifi.it**](mailto:gianluca.mattei@unifi.it?subject=[GitHub]%20Source%20Han%20Sans)
 
-[ **Reserve 30 min meeting** ](https://calendly.com/gianluca-mattei/30min)
+[ **Reserve 30 min troubleshooting meeting ** ](https://calendly.com/gianluca-mattei/30min)
 
 
 
@@ -25,6 +25,20 @@ GitHub:
 ```R
 devtools::install_github("GianlucaMattei/methyl.O", dependencies = TRUE) 
 ```
+
+Local:
+Download the tar.gz file from
+https://github.com/GianlucaMattei/methyl.O/releases/download/1.0/methyl.O.tar.gz
+
+```bash
+https://github.com/GianlucaMattei/methyl.O/releases/download/1.0/methyl.O.tar.gz
+```
+then install in R:
+
+```r
+install.packages("path/to/tar.gz", repos=NULL)
+```
+
 
 #### Run interface:
 Once the package is installed, using the function `runOnDesktop()` it is possible to initialize the user interface. 
