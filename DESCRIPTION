@@ -3,6 +3,7 @@ Title: Annotate, Score and Visualize Differentially Methylated Regions
 Version: 1.0.0
 Depends: R (>= 3.5.0)
 biocViews:
+Imports:
     BiocManager,
     EnsDb.Hsapiens.v75,
     EnsDb.Hsapiens.v86,
@@ -12,7 +13,6 @@ biocViews:
     S4Vectors (>= 0.24.4),
     Gviz (>= 1.30.0),
     ensembldb (>= 2.10.2),
-Imports:
     DT (>= 0.17),
     shiny (>= 1.6.0),
     shinycssloaders (>= 1.0.0),
