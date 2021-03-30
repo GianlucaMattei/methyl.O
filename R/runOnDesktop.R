@@ -9,7 +9,7 @@ runOnDesktop <- function(){
     ui <- shiny::fluidPage(
         shiny::tags$head(shiny::tags$meta(charset="UTF-8")), 
         shiny::tags$meta(name="description", content="Methyl.O is a R package including several utilities for smart approaches, including the integration of expression data, to study the impact of differentially methylated segments of DNA between two conditions. Link to methyl.O repo: www.github.com/GianlucaMattei/methyl.O Link to the browser version of methyl.O: www.genomica.pro"), 
-        shiny::tags$meta(name="keywords", content="methyl.o, methylo, DMRs, differentially methylated, expression integration, methylation analysis"),
+	shiny::tags$meta(name="keywords", content="methyl.o, methylo, DMRs, differentially methylated, expression integration, methylation analysis", "methylation software", "methylation tool"),
         theme = shinythemes::shinytheme("simplex"),
         shiny::navbarPage(
             "methyl.O",
