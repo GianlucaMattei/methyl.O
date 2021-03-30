@@ -27,7 +27,9 @@ devtools::install_github("GianlucaMattei/methyl.O", dependencies = TRUE)
 ```
 
 Local:
+
 Download the tar.gz file from
+
 https://github.com/GianlucaMattei/methyl.O/releases/download/1.0/methyl.O.tar.gz
 
 ```bash
