@@ -39,7 +39,7 @@ runOnDesktop <- function(){
                             "<!-- Footer -->
                             <footer class='page-footer font-large indigo'>
                             <div class='footer-copyright text-center py-3'>
-                            Methyl.O is a R package including several utilities for smart approaches, including the integration of expression data, to study the impact of differentially methylated segments of DNA between two conditions. Link to methyl.O repo: <a href='www.github.com/GianlucaMattei/methyl.O'> GianlucaMattei/methyl.O</a> Link to the browser version of methyl.O: <a href='www.genomica.pro'> www.genomica.pro</a>
+                            Methyl.O is a R package including several utilities for smart approaches, including the integration of expression data, to study the impact of differentially methylated segments of DNA between two conditions. Link to methyl.O repo: <a href='https://github.com/GianlucaMattei/methyl.O'> GianlucaMattei/methyl.O</a> Link to the browser version of methyl.O: <a href='https://genomica.pro'> www.genomica.pro</a>
                             Support: gianluca.mattei@unifi.it
                             </div>
                             </footer>
