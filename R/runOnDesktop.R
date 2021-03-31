@@ -9,7 +9,7 @@ runOnDesktop <- function(){
     ui <- shiny::fluidPage(
         shiny::tags$head(shiny::tags$meta(charset="UTF-8")), 
         shiny::tags$meta(name="description", content="Methyl.O is a R package including several utilities for smart approaches, including the integration of expression data, to study the impact of differentially methylated segments of DNA between two conditions. Link to methyl.O repo: www.github.com/GianlucaMattei/methyl.O Link to the browser version of methyl.O: www.genomica.pro"), 
-	shiny::tags$meta(name="keywords", content="methyl.o, methylo, DMRs, differentially methylated, expression integration, methylation analysis", "methylation software", "methylation tool"),
+        shiny::tags$meta(name="keywords", content="methyl.o, methylo, DMRs, differentially methylated, expression integration, methylation analysis, methylation software, methylation tool"),
         theme = shinythemes::shinytheme("simplex"),
         shiny::navbarPage(
             "methyl.O",
@@ -17,23 +17,22 @@ runOnDesktop <- function(){
                 icon = shiny::icon("home"), 
                 shiny::mainPanel(
                     align = "center", width = 8,
-                    shiny::imageOutput("logo", height = 66),
-                    shiny::hr(style = "border-top: 0px solid #000000;"),
-                    shiny::hr(style = "border-top: 0px solid #000000;"),
-                    shiny::h5("Start to navigate to use a example dataset or upload your data", style = "color:grey"),
+                    shiny::imageOutput("logo", height = 200),
+                    shiny::h5("Start to navigate to use an example dataset or upload your data", style = "color:black"),
                     shiny::hr(style = "border-top: 0px solid white;"),
-                    shiny::fluidPage(
-                        shiny::fileInput(inputId = "bedfile", label = "Upload your file here", placeholder = "select a file", multiple = FALSE),
-                        shiny::fluidRow(
+                    shiny::hr(style = "border-top: 1px solid #E9EAEA"),
+                    shiny::hr(style = "border-top: 0px solid white;"),
+                    shiny::splitLayout(
+                        shiny::fluidPage(
+                            shiny::fileInput(inputId = "bedfile", label = "Upload your file here", placeholder = "select a file", multiple = FALSE),
                             shinyWidgets::prettyRadioButtons("sep", "Select Delimiter Type", c("Comma" = ",", "Space" = " ", "Tab" = "\t"), selected = "\t", shape = "round", inline = TRUE),
                             shiny::checkboxInput("header", "Header", TRUE),
-                            shiny::checkboxInput("fraction1", "Are beta Values a Fraction of 1?", TRUE)
+                            shiny::checkboxInput("fraction1", "Are beta Values a Fraction of 1?", TRUE),
+                            shiny::tags$style(".btn-file {background-color: red; border-color: red;}"),
+                            shiny::hr(style = "border-top: 0px solid #000000;")
                         ),
-                        shiny::tags$style(".btn-file {background-color: red; border-color: red;}"),
-                        shiny::hr(style = "border-top: 0px solid #000000;")
+                        shiny::imageOutput("map", height = 600)
                     ),
-                    shiny::hr(style = "border-top: 1px solid #000000;"),
-
                     shiny::tags$footer(
                         shiny::HTML(
                             "<!-- Footer -->
@@ -46,6 +45,7 @@ runOnDesktop <- function(){
                             <!-- Footer -->"
                         )
                     ),
+                    shiny::hr(style = "border-top: 0px solid white;")
                 )
             ),
 
@@ -489,14 +489,31 @@ runOnDesktop <- function(){
     server <- function(input = input, output = output, server = server) {
         libpath <- paste0(.libPaths()[1], "/methyl.O")
 
+        output$logo <- shiny::renderImage(
+            {
+                logo <- paste0(.libPaths()[1], "/methyl.O/data/logo6.png")
+                list(
+                    src = logo,
+                    width = "40%",
+                    contentType = "image/png"
+                )
+            },
+            deleteFile = F
+        )
 
-        output$logo <- shiny::renderImage({
-            logo <- paste0(.libPaths()[1], "/methyl.O/data/logo6.png")
-            list(src = logo,
-                width =" 20%",
-                contentType = 'image/png'
-            )
-        }, deleteFile = F)
+        output$map <- shiny::renderImage(
+            {
+                map <- paste0(.libPaths()[1], "/methyl.O/data/methyloMap.png")
+                list(
+                    src = map,
+                    width = "100%",
+                    contentType = "image/png"
+                )
+            },
+            deleteFile = F
+        )
+
+
 
 
         tableIn <- shiny::reactive({
