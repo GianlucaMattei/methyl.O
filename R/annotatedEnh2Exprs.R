@@ -80,7 +80,6 @@ annotatedEnh2Exprs <- function(annotatedEnhancers, expressionProfile, hg = 'hg19
 
     colnames(toAssociate.wenhancer.working)[2] <- "usethis"
 
-
     # gene expressionProfile
     if(!is.null(col.genes) & col.genes!=0){
         expression.genes <- as.character(expressionProfile[,col.genes])
@@ -198,7 +197,11 @@ annotatedEnh2Exprs <- function(annotatedEnhancers, expressionProfile, hg = 'hg19
                 if (show.text) {
                     text(x = outTable[indPos, 1], y = outTable[indPos, 5], labels = outTable[indPos, 2])
                 }
-                abline(lm(as.numeric(outTable[indPos, 3]) ~ as.numeric(outTable[indPos, 2]) - 1), col = lmfit.col1, lty = 2, lwd = 2)
+
+                lm.line <- lm(as.numeric(outTable[indPos, 3]) ~ as.numeric(outTable[indPos, 2]) + 0)
+                x1 <- 1.5
+                y1 <- lm.line[1]$coefficients[[1]] * x1
+                segments(0, 0, x1, y1, col = lmfit.col1, lty = 2, lwd = 2)
                 par(new = T)
                 correlationPos <- cor.test(as.numeric(outTable[indPos, 3]), as.numeric(outTable[indPos, 2]), method = cor.type)
                 mtext(paste("positive R:", round(correlationPos$statistic, 3), " pval:", round(correlationPos$p.val, 3), sep = " "), side = 1, at = -0.8, line = 2.5, cex = 0.7)
@@ -213,7 +216,12 @@ annotatedEnh2Exprs <- function(annotatedEnhancers, expressionProfile, hg = 'hg19
                 if (show.text) {
                     text(x = outTable[indNeg, 1], y = outTable[indNeg, 5], labels = outTable[indNeg, 2])
                 }
-                abline(lm(as.numeric(outTable[indNeg, 3]) ~ as.numeric(outTable[indNeg, 2]) - 1), col = lmfit.col2, lty = 2, lwd = 2)
+
+                lm.line <- lm(as.numeric(outTable[indNeg, 3]) ~ as.numeric(outTable[indNeg, 2]) + 0)
+                x1 <- -1.5
+                y1 <- lm.line[1]$coefficients[[1]] * x1
+                segments(0, 0, x1, y1, col = lmfit.col2, lty = 2, lwd = 2)
+
                 correlationNeg <- cor.test(as.numeric(outTable[indNeg, 3]), as.numeric(outTable[indNeg, 2]), method = cor.type)
                 mtext(paste("negative R:", round(correlationNeg$statistic, 3), " pval:", round(correlationNeg$p.val, 3), sep = " "), side = 1, at = 0.8, line = 2.5, cex = 0.7)
             } else { correlationNeg = ''}
@@ -229,7 +237,7 @@ annotatedEnh2Exprs <- function(annotatedEnhancers, expressionProfile, hg = 'hg19
 
             plot.new()
             par(mar = c(0, 0, 0, 0), xpd = T)
-            legend("center", c("Beta Positive", "Beta Negative"), pch = 15, col = c(lmfit.col1, lmfit.col2), box.lwd = 0, cex = 1.2)
+            legend("center", c("Beta + Corr", "Beta - Corr"), pch = 15, col = c(lmfit.col1, lmfit.col2), box.lwd = 0, cex = 1.2)
         }
 
     }
