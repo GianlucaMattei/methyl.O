@@ -3,11 +3,11 @@
  
 
 ## Documentation and Contacts
-[**Documentation**](https://github.com/GianlucaMattei/methyl.O/wiki)
+[**Wiki Documentation**](https://github.com/GianlucaMattei/methyl.O/wiki)
 
 [**gianluca.mattei@unifi.it**](mailto:gianluca.mattei@unifi.it?subject=[GitHub]%20Source%20Han%20Sans)
 
-[ **Reserve 30 min troubleshooting meeting** ](https://calendly.com/gianluca-mattei/30min)
+[ **Reserve 30 min Troubleshooting Meeting** ](https://calendly.com/gianluca-mattei/30min)
 
 
 
