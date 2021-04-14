@@ -1160,7 +1160,7 @@ runOnDesktop <- function(){
             if (!is.null(input$metExpressionCorDB)) {
                 genes.db = c()
                 for(cur.db in input$metExpressionCorDB){
-                    genes.db <- c(genes.db, results[[1]][results[[1]][, cur.db] == 1, "symbol"])
+                    genes.db <- c(genes.db, resultsScore()[[1]][resultsScore()[[1]][, cur.db] == 1, "symbol"])
                 }
             genes.db
 
