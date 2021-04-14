@@ -18,7 +18,7 @@ annotatedDMRs2Enrichr <- function(annotatedDMRs, active.features = c('promoters'
     }
 
     if(stat.filter=="Overlap"){
-        stat.thr <- min(stat.thr,1)
+        stat.thr <- max(stat.thr,1)
     }
 
     if(is.null(db)){
