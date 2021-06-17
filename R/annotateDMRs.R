@@ -546,23 +546,39 @@ annotateDMRs = function(DMRsRanges , prom.length=1500, head.length=1500, longest
     # find TFs
     tf.genes <- readRDS(paste0(libpath, "/data/ENCODE_targets.RDS"))
 
-    results$promoters$TF = 0
-    results$introns$TF = 0
-    results$threeUTRs$TF = 0
-    results$fiveUTRs$TF = 0
-    results$exons$TF = 0
-    results$genes$TF = 0
-    results$heads$TF = 0
-    results$tss.surrounding$TF = 0
+    if(nrow(results$promoters)>0){
+        results$promoters$TF = 0
+        results$promoters$TF[results$promoters$symbol %in% tf.genes[, 1] %in% tf.genes[, 1]] = 1
+    }
+    if(nrow(results$introns)>0){
+        results$introns$TF = 0
+        results$introns$TF[results$introns$symbol %in% tf.genes[, 1]] <- 1
+    }
+    if(nrow(results$threeUTRs)>0){
+       results$threeUTRs$TF = 0
+       results$threeUTRs$TF[results$threeUTRs$symbol %in% tf.genes[, 1]] <- 1
+    }
+    if(nrow(results$fiveUTRs)>0){
+       results$fiveUTRs$TF = 0
+        results$fiveUTRs$TF[results$fiveUTRs$symbol %in% tf.genes[, 1]] <- 1
+    }
+    if(nrow(results$exons)>0){
+        results$exons$TF = 0
+        results$exons$TF[results$exons$symbol %in% tf.genes[, 1]] <- 1
+    }
+    if(nrow(results$genes)>0){
+        results$genes$TF = 0
+        results$genes$TF[results$genes$symbol %in% tf.genes[, 1]] <- 1
+    }
+    if(nrow(results$heads)>0){
+        results$heads$TF = 0
+       results$heads$TF[results$heads$symbol %in% tf.genes[, 1]] <- 1
+    }
+    if(nrow(results$tss.surrounding)>0){
+        results$tss.surrounding$TF = 0
+        results$tss.surrounding$TF[results$tss.surrounding$symbol %in% tf.genes[,1]] = 1
+    }
 
-    results$promoters$TF[results$promoters$symbol %in% tf.genes[,1] %in% tf.genes[,1]] = 1
-    results$introns$TF[results$introns$symbol %in% tf.genes[,1]] = 1
-    results$threeUTRs$TF[results$threeUTRs$symbol %in% tf.genes[,1]] = 1
-    results$fiveUTRs$TF[results$fiveUTRs$symbol %in% tf.genes[,1]] = 1
-    results$exons$TF[results$exons$symbol %in% tf.genes[,1]] = 1
-    results$genes$TF[results$genes$symbol %in% tf.genes[,1]] = 1
-    results$heads$TF[results$heads$symbol %in% tf.genes[,1]] = 1
-    results$tss.surrounding$TF[results$tss.surrounding$symbol %in% tf.genes[,1]] = 1
 
 
 
@@ -578,11 +594,13 @@ annotateDMRs = function(DMRsRanges , prom.length=1500, head.length=1500, longest
 
     # reordering output
     for(p in 1:length(results)){
-        ind.tf <- match('TF', colnames(results[[p]]))
-        ind.others <- match('others', colnames(results[[p]]))
-        ind.dbs <- match('database.score', colnames(results[[p]]))
-        ind.symbol <- match('symbol', colnames(results[[p]]))
-        results[[p]] <- results[[p]][,c((1:ncol(results[[p]]))[c(-ind.tf, -ind.symbol, -ind.dbs, -ind.others)], ind.tf, ind.symbol, ind.dbs, ind.others)]
+        if(nrow(results[[p]])>0){
+            ind.tf <- match('TF', colnames(results[[p]]))
+            ind.others <- match('others', colnames(results[[p]]))
+            ind.dbs <- match('database.score', colnames(results[[p]]))
+            ind.symbol <- match('symbol', colnames(results[[p]]))
+            results[[p]] <- results[[p]][,c((1:ncol(results[[p]]))[c(-ind.tf, -ind.symbol, -ind.dbs, -ind.others)], ind.tf, ind.symbol, ind.dbs, ind.others)]
+        }
     }
 
     # sort the output
