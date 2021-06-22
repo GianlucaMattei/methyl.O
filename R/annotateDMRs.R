@@ -77,7 +77,7 @@ annotateDMRs = function(DMRsRanges , prom.length=1500, head.length=1500, longest
     genes.coordinates.withPromoters[-which(strand.map), "end"] <- genes.coordinates[-which(strand.map), "end"] + prom.length
     db.genes <- GenomicRanges::makeGRangesFromDataFrame(genes.coordinates.withPromoters, keep.extra.columns = T)
 
-    # overlap annotations and Mets
+    # overlap annotations/DMRs
     annotated.table <- data.frame()
     default.colnames <- c("seqnames", "start", "end", "width", "beta", "others", "gene.start", "gene.end", "gene.width", "gene.strand", "gene.id", "tx.name", "genes.perc", "tag")
     hits <- GenomicRanges::findOverlaps(db.genes, DMRs.ranges)
@@ -177,7 +177,7 @@ annotateDMRs = function(DMRsRanges , prom.length=1500, head.length=1500, longest
         db.exons.ranges <- readRDS(file = paste0(libpath,"/data/db.exons_UCSC_",hg ,".RDS"))
     }
 
-    db.exons.ranges <- db.exons.ranges[txs.selected$tx.name]
+    db.exons.ranges <- db.exons.ranges[which(names(db.exons.ranges) %in% txs.selected$tx.name)]
     db.exons.ranges.unlist <- unlist(db.exons.ranges)
 
     # overlap
@@ -237,8 +237,8 @@ annotateDMRs = function(DMRsRanges , prom.length=1500, head.length=1500, longest
         db.five.ranges <- readRDS(file = paste0(libpath,"/data/five.utrs_UCSC_",hg ,".RDS"))
         db.three.ranges <- readRDS(file = paste0(libpath,"/data/three.utrs_UCSC_",hg ,".RDS"))
     }
-    db.five.ranges <- unlist(db.five.ranges[intersect(txs.selected$tx.name, names(db.five.ranges))])
-    db.three.ranges <- unlist(db.three.ranges[intersect(txs.selected$tx.name, names(db.three.ranges))])
+    db.five.ranges <- unlist(db.five.ranges[which(txs.selected$tx.name %in% names(db.five.ranges))])
+    db.three.ranges <- unlist(db.three.ranges[which(txs.selected$tx.name %in% names(db.three.ranges))])
 
     annotated.table.fives <- data.frame()
     default.fives.colnames <- c("seqnames", "start", "end", "width", "beta", "gene.id", "others", "five.start", "five.end", "five.width", "strand", "rank", "tx.name", "overlap.width.five", "overlap.perc.five", "tag")
@@ -439,7 +439,7 @@ annotateDMRs = function(DMRsRanges , prom.length=1500, head.length=1500, longest
     }
 
     names(db.introns.ranked.gr) <- data.frame(db.introns.ranked.gr, stringsAsFactors = F)$group_name
-    db.introns.ranked.gr <- db.introns.ranked.gr[intersect(names(db.introns.ranked.gr), txs.selected$tx.name)]
+    db.introns.ranked.gr <- db.introns.ranked.gr[names(db.introns.ranked.gr) %in% txs.selected$tx.name]
 
     # overlap introns with SVs
     annotated.table.introns <- data.frame()
