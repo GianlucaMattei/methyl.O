@@ -1,24 +1,3 @@
-#' Annotates the the differentially methylated regions.
-#' 
-#' Maps DMRs on genes returning a list for each features.
-#'  
-#' @param DMRsRanges data.frame, the DMRs ranges, it must have the following columns: chr, start, end, beta diff. Other columns will be stored in the resulting output under the column other.
-#' @param prom.length numeric, length of promoters. Default = 1500
-#' @param head.length numeric, length of the first part of the gene, named head, starting from the TSS. If longer than the gene, the entire txs will be considered as head. Default = 1500
-#' @param longest.trx logical, option to use the longest transcript to represent the gene
-#' @param annotation character, database to use for transcripts mapping. Available "ensembl" or "ucsc". Default ="ensembl"
-#' @param hg character, Available "hg19", "hg38". Genome assembly version. Default = "hg19"
-#' @param annotation.fast logical, compute 1:1 mapping or 1:many - many:1 - many:many mapping. Default = TRUE
-#' @param thr.beta numeric, beta difference threshold to consider methylations. Default = 0.3
-#' @param thr.cgis numeric, length, in percentage, of methylated CGIs in order to be considered altered. Default = 0.4
-#' @param col.betadiff nuemric, column position for beta diff. in input table. Default = 4
-#' @param col.beta1 numeric, column position for first sample beta values in input table
-#' @param col.beta2 numeric, column position for second sample beta values in input table
-#' 
-#' @return list, features overlapped by annotated DMRs
-#' 
-#' @export
-
 annotateDMRs = function(DMRsRanges , prom.length=1500, head.length=1500, longest.trx=TRUE, annotation='ensembl', hg='hg19', annotation.fast=TRUE, thr.beta=.3, thr.cgis=.4, col.betadiff = 4, col.beta1 = NULL, col.beta2 = NULL) {
     libpath <- paste0(.libPaths()[1], "/methyl.O")
 
@@ -129,7 +108,7 @@ annotateDMRs = function(DMRsRanges , prom.length=1500, head.length=1500, longest
 
 
     # move "others" col to the end
-    if(any(match('others', colnames(results$genes)))){
+    if(!is.na(match('others', colnames(results$genes)))){
         results$genes <- cbind(results$genes[,-match('others', colnames(results$genes))],
             others = results$genes[,match('others', colnames(results$genes))]
             )
@@ -182,7 +161,7 @@ annotateDMRs = function(DMRsRanges , prom.length=1500, head.length=1500, longest
 
 
     # move "others" col to the end
-    if(any(match('others', colnames(results$heads)))){
+    if(!is.na(match('others', colnames(results$heads)))){
         results$heads <- cbind(results$heads[,-match('others', colnames(results$heads))],
             others = results$heads[,match('others', colnames(results$heads))]
             )
@@ -215,16 +194,17 @@ annotateDMRs = function(DMRsRanges , prom.length=1500, head.length=1500, longest
 
     # Overlap lengths, perc, frame
     table.exons.overlapping.tmp <- table.exons.overlapping
-    overlaps <- GenomicRanges::pintersect(db.exons.ranges.overlapping, GenomicRanges::makeGRangesFromDataFrame(table.exons.overlapping.tmp, keep.extra.columns = T))
-    width.overlap <- S4Vectors::width(overlaps)
-    percent.overlap <- width.overlap / S4Vectors::width(db.exons.ranges.overlapping) *100
-    annotated.table.exons <- cbind(table.exons.overlapping[, c('seqnames','start','end','width','beta', 'others')], db.exons.overlapping, overlap.width.ex = width.overlap, overlap.perc.ex = percent.overlap)
-
-    # annotate
-    annotations <- biomaRt::select(genedb, keys = as.character(annotated.table.exons$tx.name),columns = "GENEID", keytype = ktype.txs)
-    annotated.table.exons$gene.id <- annotations$GENEID[match(annotated.table.exons$tx.name, annotations[,1])]
-    annotated.table.exons$tag <- apply(annotated.table.exons,1,function(x){gsub(' +', '', paste0(x[1:3], collapse='_'))})
-
+    if(length(db.exons.ranges.overlapping)>0){
+        overlaps <- GenomicRanges::pintersect(db.exons.ranges.overlapping, GenomicRanges::makeGRangesFromDataFrame(table.exons.overlapping.tmp, keep.extra.columns = T))
+        width.overlap <- S4Vectors::width(overlaps)
+        percent.overlap <- width.overlap / S4Vectors::width(db.exons.ranges.overlapping) *100
+        annotated.table.exons <- cbind(table.exons.overlapping[, c('seqnames','start','end','width','beta', 'others')], db.exons.overlapping, overlap.width.ex = width.overlap, overlap.perc.ex = percent.overlap)
+    
+        # annotate
+        annotations <- biomaRt::select(genedb, keys = as.character(annotated.table.exons$tx.name),columns = "GENEID", keytype = ktype.txs)
+        annotated.table.exons$gene.id <- annotations$GENEID[match(annotated.table.exons$tx.name, annotations[,1])]
+        annotated.table.exons$tag <- apply(annotated.table.exons,1,function(x){gsub(' +', '', paste0(x[1:3], collapse='_'))})
+    }
 
     # format the "other" column
     if(nrow(annotated.table.exons)>0){
@@ -291,8 +271,6 @@ annotateDMRs = function(DMRsRanges , prom.length=1500, head.length=1500, longest
         annotated.table.fives$gene.id <- annotations$GENEID[match(annotated.table.fives$tx.name, annotations[,1])]
         annotated.table.fives$tag = apply(annotated.table.fives,1, function(x) {gsub(' +', '', paste0(x[1:3], collapse='_'))})
     }
-
-
 
     # THREE
     hits <- GenomicRanges::findOverlaps(db.three.ranges, DMRs.ranges)
@@ -366,14 +344,16 @@ annotateDMRs = function(DMRsRanges , prom.length=1500, head.length=1500, longest
         gsub(" +", "", paste0(x[1:3], collapse = "_"))
     })
     table.prom.overlapping.tmp <- table.prom.overlapping
-    overlaps <- GenomicRanges::pintersect(prom.overlapping.ranges, GenomicRanges::makeGRangesFromDataFrame(table.prom.overlapping.tmp, keep.extra.columns = T))
-    width.overlap <- S4Vectors::width(overlaps)
-    percent.overlap <- width.overlap / S4Vectors::width(prom.overlapping.ranges) * 100
-    prom.overlapping.df <- data.frame(prom.overlapping.ranges)
-    colnames(prom.overlapping.df) <- c("seqnames", "prom.start", "prom.end", "prom.width", "strand", "gene.id", "tx.name")
-    annotated.table.proms <- cbind(table.prom.overlapping[,c("seqnames", "start", "end", "width", "beta", "others", "tag")], prom.overlapping.df[, c("prom.start", "prom.end","prom.width","strand", "gene.id", "tx.name")],overlap.width.prom = width.overlap, overlap.perc.prom = percent.overlap)
-    annotated.table.proms <- annotated.table.proms[, annotated.proms.table.colnames]
-
+    
+    if(length(prom.overlapping.ranges)>0){
+        overlaps <- GenomicRanges::pintersect(prom.overlapping.ranges, GenomicRanges::makeGRangesFromDataFrame(table.prom.overlapping.tmp, keep.extra.columns = T))
+        width.overlap <- S4Vectors::width(overlaps)
+        percent.overlap <- width.overlap / S4Vectors::width(prom.overlapping.ranges) * 100
+        prom.overlapping.df <- data.frame(prom.overlapping.ranges)
+        colnames(prom.overlapping.df) <- c("seqnames", "prom.start", "prom.end", "prom.width", "strand", "gene.id", "tx.name")
+        annotated.table.proms <- cbind(table.prom.overlapping[,c("seqnames", "start", "end", "width", "beta", "others", "tag")], prom.overlapping.df[, c("prom.start", "prom.end","prom.width","strand", "gene.id", "tx.name")],overlap.width.prom = width.overlap, overlap.perc.prom = percent.overlap)
+        annotated.table.proms <- annotated.table.proms[, annotated.proms.table.colnames]
+    }
 
     if(length(annotated.table.proms$others)>0){
         results$promoters <- cbind(annotated.table.proms[,-7], others = annotated.table.proms[, "others"])
@@ -414,22 +394,30 @@ annotateDMRs = function(DMRsRanges , prom.length=1500, head.length=1500, longest
         gsub(" +", "", paste0(x[1:3], collapse = "_"))
     })
     table.tss.overlapping.tmp <- table.tss.overlapping
-    overlaps <- GenomicRanges::pintersect(tss.overlapping.ranges, GenomicRanges::makeGRangesFromDataFrame(table.tss.overlapping.tmp, keep.extra.columns = T))
-    width.overlap <- S4Vectors::width(overlaps)
-    percent.overlap <- width.overlap / S4Vectors::width(tss.overlapping.ranges) * 100
-    tss.overlapping.df <- data.frame(tss.overlapping.ranges)
-    colnames(tss.overlapping.df) <- c("seqnames", "tss.sur.start", "tss.sur.end", "tss.sur.width", "strand", "gene.id", "tx.name")
-    annotated.table.tss <- cbind(table.tss.overlapping[, c("seqnames", "start", "end", "width", "beta", "others", "tag")], tss.overlapping.df[, c("tss.sur.start", "tss.sur.end", "tss.sur.width", "strand", "gene.id", "tx.name")], overlap.width.tss.sur = width.overlap, overlap.perc.tss.sur = percent.overlap)
-    annotated.table.tss <- annotated.table.tss[, annotated.tss.table.colnames]
-    
-    if(any(colnames(annotated.table.tss) %in% "others")){
-        annotated.table.tss <- cbind(annotated.table.tss[, -match("others", colnames(annotated.table.tss))], others = annotated.table.tss[, match("others", colnames(annotated.table.tss))])
+
+    if(length(tss.overlapping.ranges)>0){
+        overlaps <- GenomicRanges::pintersect(tss.overlapping.ranges, GenomicRanges::makeGRangesFromDataFrame(table.tss.overlapping.tmp, keep.extra.columns = T))
+        width.overlap <- S4Vectors::width(overlaps)
+        percent.overlap <- width.overlap / S4Vectors::width(tss.overlapping.ranges) * 100
+        tss.overlapping.df <- data.frame(tss.overlapping.ranges)
+        colnames(tss.overlapping.df) <- c("seqnames", "tss.sur.start", "tss.sur.end", "tss.sur.width", "strand", "gene.id", "tx.name")
+        annotated.table.tss <- cbind(table.tss.overlapping[, c("seqnames", "start", "end", "width", "beta", "others", "tag")], tss.overlapping.df[, c("tss.sur.start", "tss.sur.end", "tss.sur.width", "strand", "gene.id", "tx.name")], overlap.width.tss.sur = width.overlap, overlap.perc.tss.sur = percent.overlap)
+        annotated.table.tss <- annotated.table.tss[, annotated.tss.table.colnames]
+    }
+
+    if (length(annotated.table.proms$others) > 0) {
+        results$promoters <- cbind(annotated.table.proms[, -7], others = annotated.table.proms[, "others"])
     } else {
-        annotated.table.tss$others <- ""
+        results$promoters <- annotated.table.proms
     }
 
 
-    results$tss.surrounding <- annotated.table.tss
+    if(any(colnames(annotated.table.tss) %in% "others")){
+        results$tss.surrounding <- cbind(annotated.table.tss[, -match("others", colnames(annotated.table.tss))], others = annotated.table.tss[, match("others", colnames(annotated.table.tss))])
+    } else {
+        results$tss.surrounding <- annotated.table.tss
+    }
+
 
     # databases overlap and database-score
     if (nrow(results$tss.surrounding) > 0) {
@@ -441,9 +429,6 @@ annotateDMRs = function(DMRsRanges , prom.length=1500, head.length=1500, longest
         results$tss.surrounding$cosmic.CGIs <- methyl.O::queryDatabase(results$tss.surrounding, cosmic.CGIs, return.table = FALSE, is.genomic.ranges = TRUE, thr = thr.cgis)
         results$tss.surrounding$CGIs <- methyl.O::queryDatabase(results$tss.surrounding, cgis, return.table = FALSE, thr = thr.cgis)
     }
-  
-
-
 
 
     ##### INTRONS
@@ -471,20 +456,21 @@ annotateDMRs = function(DMRsRanges , prom.length=1500, head.length=1500, longest
     annotated.table.introns <- cbind(table.introns.overlapping, db.introns.overlapping[, -1])
 
     # SCORING OVERLAPS
-    overlaps <- GenomicRanges::pintersect(db.introns.ranges.overlapping, GenomicRanges::makeGRangesFromDataFrame(annotated.table.introns, keep.extra.columns = T))
+    if(length(db.introns.ranges.overlapping)>0){
+        overlaps <- GenomicRanges::pintersect(db.introns.ranges.overlapping, GenomicRanges::makeGRangesFromDataFrame(annotated.table.introns, keep.extra.columns = T))
+        width.overlap <- S4Vectors::width(overlaps)
+        percent.overlap <- width.overlap / S4Vectors::width(db.introns.ranges.overlapping) * 100
+        annotated.table.introns$overlap.width.intron <- width.overlap
+        annotated.table.introns$overlap.perc.intron <- percent.overlap
+        annotated.table.introns$tag <- apply(annotated.table.introns, 1, function(x) {
+            gsub(" +", "", paste0(x[1:3], collapse = "_"))
+        })
 
-    width.overlap <- S4Vectors::width(overlaps)
-    percent.overlap <- width.overlap / S4Vectors::width(db.introns.ranges.overlapping) * 100
-    annotated.table.introns$overlap.width.intron <- width.overlap
-    annotated.table.introns$overlap.perc.intron <- percent.overlap
-    annotated.table.introns$tag <- apply(annotated.table.introns, 1, function(x) {
-        gsub(" +", "", paste0(x[1:3], collapse = "_"))
-    })
-
-    # annotate
-    annotations <- biomaRt::select(genedb, keys = as.character(annotated.table.introns$tx.name), columns = "GENEID", keytype = ktype.txs)
-    annotated.table.introns$gene.id <- annotations$GENEID[match(annotated.table.introns$tx.name, annotations[,1])]
-    annotated.table.introns <- annotated.table.introns[, annotated.table.introns.colnames]
+        # annotate
+        annotations <- biomaRt::select(genedb, keys = as.character(annotated.table.introns$tx.name), columns = "GENEID", keytype = ktype.txs)
+        annotated.table.introns$gene.id <- annotations$GENEID[match(annotated.table.introns$tx.name, annotations[,1])]
+        annotated.table.introns <- annotated.table.introns[, annotated.table.introns.colnames]
+    }
 
     results$introns <- annotated.table.introns
 
@@ -578,8 +564,6 @@ annotateDMRs = function(DMRsRanges , prom.length=1500, head.length=1500, longest
         results$tss.surrounding$TF = 0
         results$tss.surrounding$TF[results$tss.surrounding$symbol %in% tf.genes[,1]] = 1
     }
-
-
 
 
     # computing database score
