@@ -1,4 +1,4 @@
-annotateDMRs = function(DMRsRanges , prom.length=1500, head.length=1500, longest.trx=TRUE, annotation='ensembl', hg='hg19', annotation.fast=TRUE, thr.beta=.3, thr.cgis=.4, col.betadiff = 4, col.beta1 = NULL, col.beta2 = NULL) {
+annotateDMRs = function(DMRsRanges, prom.length=1500, head.length=1500, longest.trx=TRUE, annotation='ensembl', hg='hg19', annotation.fast=TRUE, thr.beta=.3, thr.cgis=.4, col.betadiff=4, col.beta1=NULL, col.beta2=NULL) {
     libpath <- paste0(.libPaths()[1], "/methyl.O")
 
     ncg <- read.table(sep = "\t", stringsAsFactors = F, header = T, paste0(libpath, "/data/pathsToGene_NCG.tsv"))
@@ -106,7 +106,6 @@ annotateDMRs = function(DMRsRanges , prom.length=1500, head.length=1500, longest
         results$genes$CGIs <- methyl.O::queryDatabase(results$genes, cgis, return.table = FALSE, ,thr=thr.cgis)
     }
 
-
     # move "others" col to the end
     if(!is.na(match('others', colnames(results$genes)))){
         results$genes <- cbind(results$genes[,-match('others', colnames(results$genes))],
@@ -159,16 +158,12 @@ annotateDMRs = function(DMRsRanges , prom.length=1500, head.length=1500, longest
         results$heads$CGIs <- methyl.O::queryDatabase(results$heads, cgis, return.table = FALSE, ,thr=thr.cgis)
     }
 
-
     # move "others" col to the end
     if(!is.na(match('others', colnames(results$heads)))){
         results$heads <- cbind(results$heads[,-match('others', colnames(results$heads))],
             others = results$heads[,match('others', colnames(results$heads))]
             )
     }
-
-
-
 
     ##### EXONS
     if(annotation == 'ensembl'){
@@ -228,7 +223,6 @@ annotateDMRs = function(DMRsRanges , prom.length=1500, head.length=1500, longest
         results$exons$CGIs <- methyl.O::queryDatabase(results$exons, cgis, return.table = FALSE,thr=thr.cgis)
     }
 
-
     #### UTRS
     if(annotation == 'ensembl'){
         db.five.ranges <- readRDS(file = paste0(libpath,"/data/five.utrs_ENSEMBL_",hg ,".RDS"))
@@ -237,8 +231,8 @@ annotateDMRs = function(DMRsRanges , prom.length=1500, head.length=1500, longest
         db.five.ranges <- readRDS(file = paste0(libpath,"/data/five.utrs_UCSC_",hg ,".RDS"))
         db.three.ranges <- readRDS(file = paste0(libpath,"/data/three.utrs_UCSC_",hg ,".RDS"))
     }
-    db.five.ranges <- unlist(db.five.ranges[which(txs.selected$tx.name %in% names(db.five.ranges))])
-    db.three.ranges <- unlist(db.three.ranges[which(txs.selected$tx.name %in% names(db.three.ranges))])
+    db.five.ranges <- unlist(db.five.ranges[which(names(db.five.ranges) %in% txs.selected$tx.name)])
+    db.three.ranges <- unlist(db.three.ranges[which(names(db.three.ranges) %in% txs.selected$tx.name)])
 
     annotated.table.fives <- data.frame()
     default.fives.colnames <- c("seqnames", "start", "end", "width", "beta", "gene.id", "others", "five.start", "five.end", "five.width", "strand", "rank", "tx.name", "overlap.width.five", "overlap.perc.five", "tag")
@@ -322,7 +316,6 @@ annotateDMRs = function(DMRsRanges , prom.length=1500, head.length=1500, longest
         results$threeUTRs$CGIs <- methyl.O::queryDatabase(results$threeUTRs, cgis, return.table = FALSE, thr = thr.cgis)
     }
 
-
     ##### PROMOTERS
     # promoter coordinates
     proms.coordinates <- genes.coordinates
@@ -372,7 +365,6 @@ annotateDMRs = function(DMRsRanges , prom.length=1500, head.length=1500, longest
         results$promoters$CGIs <- methyl.O::queryDatabase(results$promoters, cgis, return.table = FALSE, thr = thr.cgis)
     }
 
-
     ###TSS SURROUNDING
     coordinates.tss <- proms.coordinates
     cur.pos <- coordinates.tss$strand == "+"
@@ -411,13 +403,11 @@ annotateDMRs = function(DMRsRanges , prom.length=1500, head.length=1500, longest
         results$promoters <- annotated.table.proms
     }
 
-
     if(any(colnames(annotated.table.tss) %in% "others")){
         results$tss.surrounding <- cbind(annotated.table.tss[, -match("others", colnames(annotated.table.tss))], others = annotated.table.tss[, match("others", colnames(annotated.table.tss))])
     } else {
         results$tss.surrounding <- annotated.table.tss
     }
-
 
     # databases overlap and database-score
     if (nrow(results$tss.surrounding) > 0) {
@@ -429,7 +419,6 @@ annotateDMRs = function(DMRsRanges , prom.length=1500, head.length=1500, longest
         results$tss.surrounding$cosmic.CGIs <- methyl.O::queryDatabase(results$tss.surrounding, cosmic.CGIs, return.table = FALSE, is.genomic.ranges = TRUE, thr = thr.cgis)
         results$tss.surrounding$CGIs <- methyl.O::queryDatabase(results$tss.surrounding, cgis, return.table = FALSE, thr = thr.cgis)
     }
-
 
     ##### INTRONS
     if(annotation == 'ensembl'){
@@ -485,9 +474,7 @@ annotateDMRs = function(DMRsRanges , prom.length=1500, head.length=1500, longest
         results$introns$CGIs <- methyl.O::queryDatabase(results$introns, cgis, return.table = FALSE, thr = thr.cgis)
     }
 
-
     # converting to gene symbols
-
     if(annotation.fast == TRUE){
         for(i in 1:length(results)){
             if(nrow(results[[i]])>0){
@@ -513,7 +500,6 @@ annotateDMRs = function(DMRsRanges , prom.length=1500, head.length=1500, longest
                     }
                     gene.symbols <- gene.symbols[-cur.ind.dup,]
                 }
-
 
                 # add symbols column
                 results[[i]]$symbol <- ""
@@ -565,7 +551,6 @@ annotateDMRs = function(DMRsRanges , prom.length=1500, head.length=1500, longest
         results$tss.surrounding$TF[results$tss.surrounding$symbol %in% tf.genes[,1]] = 1
     }
 
-
     # computing database score
     results$promoters$database.score <- apply(cbind(results$promoters$dgv, results$promoters$gnomad, results$promoters$NCG, results$promoters$COSMIC, results$promoters$cosmic.CGIs, results$promoters$TF), 1, sum)
     results$introns$database.score <- apply(cbind(results$introns$dgv, results$introns$gnomad, results$introns$NCG, results$introns$COSMIC, results$introns$cosmic.CGIs, results$introns$TF), 1, sum)
@@ -591,5 +576,4 @@ annotateDMRs = function(DMRsRanges , prom.length=1500, head.length=1500, longest
     order.output <- c("genes", "heads", "tss.surrounding", "promoters", "fiveUTRs", "exons", "introns", "threeUTRs")
     results <- results[order.output]
     return(results)
-
 }
